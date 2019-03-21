@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "458904607999-3gci4vmshlqfmgbjqr6c9k24hao7mdfq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.luca.genlike",
+            "certificate_hash": "776877a6dbbf82ab4c4b4aafc413d31d62663b94"
+          }
+        },
+        {
           "client_id": "458904607999-lqlqrsprc6bgimh2i40rh0q28fc0k8ks.apps.googleusercontent.com",
           "client_type": 3
         }
