@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -15,13 +16,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,20 +33,40 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.luca.genlike.Http.MyRequest;
+import com.luca.genlike.Model.VolleySingleton;
 import com.luca.genlike.Utils.Utils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1; //Used for permissions
     private static final int REQUEST_CODE_LOC = 2;
     private FirebaseAuth mAuth;
     private CallbackManager callbackManager;
+    private RequestQueue queue;
+    private MyRequest myRequest;
+    private AccessToken mAccessToken;
+    private JSONObject mUser;
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        queue = VolleySingleton.getInstance(this).getRequestQueue();
+        myRequest = new MyRequest(this, queue);
         callbackManager = CallbackManager.Factory.create();
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
@@ -54,7 +75,24 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                handleFacebookAccessToken(loginResult.getAccessToken());
+                mAccessToken = loginResult.getAccessToken();
+                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        try {
+                            mUser = object;
+                            new JsonTask().execute("https://api.genderize.io/?name=" + object.getString("first_name"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Utils.debug(LoginActivity.this, e.getMessage());
+                        }
+                    }
+                });
+
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id, email, birthday, friends, first_name, last_name, gender, name");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override
@@ -91,6 +129,15 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    /*@Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user != null){
+            Utils.changeActivity(LoginActivity.this, MainActivity.class);
+        }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -179,5 +226,86 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private class JsonTask extends AsyncTask<String, String, String> {
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            pd = new ProgressDialog(LoginActivity.this);
+            pd.setMessage("Please wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        protected String doInBackground(String... params) {
+
+
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+
+            try {
+                URL url = new URL(params[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+
+
+                InputStream stream = connection.getInputStream();
+
+                reader = new BufferedReader(new InputStreamReader(stream));
+
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line+"\n");
+                    Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
+
+                }
+
+                return buffer.toString();
+
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (pd.isShowing()){
+                pd.dismiss();
+            }
+            try {
+                String gender = "null";
+                JSONObject object = new JSONObject(result);
+                if(object.getString("gender").equals("male")){
+                    gender = "Male";
+                }else{
+                    gender = "Female";
+                }
+                String userID = mAuth.getCurrentUser().getUid();
+                DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID);
+                db.setValue(mUser.getString("first_name"));
+                handleFacebookAccessToken(mAccessToken);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }
