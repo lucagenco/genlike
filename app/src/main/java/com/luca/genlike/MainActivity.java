@@ -1,26 +1,23 @@
 package com.luca.genlike;
-
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.luca.genlike.Controller.SwipeFling;
-import com.luca.genlike.Database.DatabaseManager;
 import com.luca.genlike.Utils.Utils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,10 +25,10 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> al;
     private ArrayAdapter<String> arrayAdapter;
     SwipeFlingAdapterView flingContainer;
-    private DatabaseManager manager;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
-    private String oppositeGender;
+    private String userSex;
+    private String oppositeUserSex;
 
     //WIDGET
     private Button btnSignOut;
@@ -42,21 +39,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         btnSignOut = findViewById(R.id.logOut);
-        manager = new DatabaseManager();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        Utils.debug(MainActivity.this, mUser.getUid());
-        //oppositeGender = manager.getOppositeGender();
-        //Utils.debug(MainActivity.this, oppositeGender);
+        checkUserSex();
+
         al = new ArrayList<>();
-        al.add("php");
-        al.add("c");
-        al.add("python");
-        al.add("java");
-        al.add("html");
-        al.add("c++");
-        al.add("css");
-        al.add("javascript");
 
         arrayAdapter = new ArrayAdapter<>(this, R.layout.item, R.id.helloText, al);
 
@@ -73,13 +60,113 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*btnSignOut.setOnClickListener(new View.OnClickListener() {
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                manager.signOut();
+                mAuth.signOut();
                 Utils.changeActivity(MainActivity.this, LoginActivity.class);
             }
-        });*/
+        });
+    }
+
+    public void checkUserSex(){
+        DatabaseReference dbMale = FirebaseDatabase.getInstance().getReference().child("Users").child("Male");
+        dbMale.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if(dataSnapshot.getKey().equals(mUser.getUid())){
+                    userSex = "Male";
+                    oppositeUserSex = "Female";
+                    getOppositeSex();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference dbFemale = FirebaseDatabase.getInstance().getReference().child("Users").child("Female");
+        dbFemale.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if(dataSnapshot.getKey().equals(mUser.getUid())){
+                    userSex = "Female";
+                    oppositeUserSex = "Male";
+                    getOppositeSex();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getOppositeSex(){
+        DatabaseReference oppositeDbSex = FirebaseDatabase.getInstance().getReference().child("Users").child(oppositeUserSex);
+        oppositeDbSex.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if(dataSnapshot.exists()){
+                    al.add(dataSnapshot.child("first_name").getValue().toString());
+                    arrayAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }
+

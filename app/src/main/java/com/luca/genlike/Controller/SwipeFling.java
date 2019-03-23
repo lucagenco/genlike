@@ -40,10 +40,6 @@ public class SwipeFling implements SwipeFlingAdapterView.onFlingListener {
 
     @Override
     public void onAdapterAboutToEmpty(int i) {
-        al.add("XML ".concat(String.valueOf(i)));
-        arrayAdapter.notifyDataSetChanged();
-        Log.d("LIST", "notified");
-        i++;
     }
 
     @Override

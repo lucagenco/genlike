@@ -29,6 +29,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -80,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
-
+        LoginManager.getInstance().logOut();
         checkPermissions();
         //GPS
         initLocation();
