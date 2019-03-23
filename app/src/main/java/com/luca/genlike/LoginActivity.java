@@ -1,10 +1,16 @@
 package com.luca.genlike;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +32,7 @@ import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
@@ -37,6 +44,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.luca.genlike.Http.MyRequest;
 import com.luca.genlike.Model.VolleySingleton;
+import com.luca.genlike.Utils.GenderDialog;
 import com.luca.genlike.Utils.Utils;
 
 import org.json.JSONException;
@@ -54,27 +62,34 @@ public class LoginActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1; //Used for permissions
     private static final int REQUEST_CODE_LOC = 2;
     private FirebaseAuth mAuth;
+    private FirebaseUser fireUser;
     private CallbackManager callbackManager;
-    private RequestQueue queue;
-    private MyRequest myRequest;
     private AccessToken mAccessToken;
     private JSONObject mUser;
+    private String gender = "null";
     ProgressDialog pd;
+    private LocationManager locationManager;
+
+    private String mLatitude;
+    private String mLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        queue = VolleySingleton.getInstance(this).getRequestQueue();
-        myRequest = new MyRequest(this, queue);
         callbackManager = CallbackManager.Factory.create();
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
+
+        checkPermissions();
+        //GPS
+        initLocation();
+
         LoginButton loginButton = findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email", "public_profile");
+        loginButton.setReadPermissions("email", "public_profile", "user_birthday");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
+            public void onSuccess(final LoginResult loginResult) {
                 mAccessToken = loginResult.getAccessToken();
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
@@ -105,17 +120,23 @@ public class LoginActivity extends AppCompatActivity {
                 // ...
             }
         });
-        checkPermissions();
+
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
-
+        pd = new ProgressDialog(LoginActivity.this);
+        pd.setMessage("Connexion au profil...");
+        pd.setCancelable(false);
+        pd.show();
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            if (pd.isShowing()){
+                                pd.dismiss();
+                            }
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
                             Utils.changeActivity(LoginActivity.this, MainActivity.class);
@@ -232,7 +253,7 @@ public class LoginActivity extends AppCompatActivity {
             super.onPreExecute();
 
             pd = new ProgressDialog(LoginActivity.this);
-            pd.setMessage("Please wait");
+            pd.setMessage("Récupération d'informations...");
             pd.setCancelable(false);
             pd.show();
         }
@@ -258,7 +279,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line+"\n");
-                    Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
+                    Log.d("Response: ", "> " + line);
 
                 }
 
@@ -291,21 +312,97 @@ public class LoginActivity extends AppCompatActivity {
                 pd.dismiss();
             }
             try {
-                String gender = "null";
                 JSONObject object = new JSONObject(result);
                 if(object.getString("gender").equals("male")){
                     gender = "Male";
-                }else{
+                }else if(object.getString("gender").equals("female")){
                     gender = "Female";
+                }else{
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
+                    builder1.setMessage("Votre sexe n'as pas été trouvé. D'autres options seront disponible sur la page profil.");
+                    builder1.setCancelable(false);
+                    builder1.setPositiveButton(
+                            "Je suis un homme",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                    gender = "Homme";
+                                }
+                            });
+
+                    builder1.setNegativeButton(
+                            "Je suis une femme",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                    gender = "Femme";
+                                }
+                            });
+
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
                 }
+
                 String userID = mAuth.getCurrentUser().getUid();
-                DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID);
-                db.setValue(mUser.getString("first_name"));
+                //FIRST_NAME
+                DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("first_name");
+                db_first_name.setValue(mUser.getString("first_name"));
+                //LAST_NAME
+                DatabaseReference db_last_name = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("last_name");
+                db_last_name.setValue(mUser.getString("last_name"));
+                //ID_FACEBOOK
+                DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("id_facebook");
+                db_id_facebook.setValue(mUser.getString("id"));
+                //YEAR OLD
+                String[] birthday = mUser.getString("birthday").split("/");
+                int age = Utils.getAge(birthday[2], birthday[1], birthday[0]);
+                DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("age");
+                db_age.setValue(age);
+                //POSITION
+                DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("latitude");
+                db_latitude.setValue(mLatitude);
+                DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("longitude");
+                db_longitude.setValue(mLongitude);
+
                 handleFacebookAccessToken(mAccessToken);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    public void initLocation(){
+        pd = new ProgressDialog(LoginActivity.this);
+        pd.setMessage("Récupération de la position...");
+        pd.setCancelable(false);
+        pd.show();
+        locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if (pd.isShowing()){
+                    pd.dismiss();
+                }
+                mLatitude = String.valueOf(location.getLatitude());
+                mLongitude = String.valueOf(location.getLongitude());
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        });
     }
 
 }

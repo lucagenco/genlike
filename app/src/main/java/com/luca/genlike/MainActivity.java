@@ -7,11 +7,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.luca.genlike.Controller.SwipeFling;
+import com.luca.genlike.Database.DatabaseManager;
+import com.luca.genlike.Utils.Utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,14 +28,26 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> al;
     private ArrayAdapter<String> arrayAdapter;
     SwipeFlingAdapterView flingContainer;
+    private DatabaseManager manager;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private String oppositeGender;
+
+    //WIDGET
+    private Button btnSignOut;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        btnSignOut = findViewById(R.id.logOut);
+        manager = new DatabaseManager();
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        Utils.debug(MainActivity.this, mUser.getUid());
+        //oppositeGender = manager.getOppositeGender();
+        //Utils.debug(MainActivity.this, oppositeGender);
         al = new ArrayList<>();
         al.add("php");
         al.add("c");
@@ -55,8 +73,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
+        /*btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manager.signOut();
+                Utils.changeActivity(MainActivity.this, LoginActivity.class);
+            }
+        });*/
     }
 
 }
