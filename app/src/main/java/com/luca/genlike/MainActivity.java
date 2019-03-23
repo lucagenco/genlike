@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,20 +16,24 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
+import com.luca.genlike.Controller.ArrayCardsAdapter;
+import com.luca.genlike.Controller.Cards;
 import com.luca.genlike.Controller.SwipeFling;
 import com.luca.genlike.Utils.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    private ArrayList<String> al;
-    private ArrayAdapter<String> arrayAdapter;
+    private Cards cards_data[];
+    private ArrayCardsAdapter cardsAdapter;
     SwipeFlingAdapterView flingContainer;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private String userSex;
     private String oppositeUserSex;
+    ListView listView;
+    List<Cards> rowItems;
 
     //WIDGET
     private Button btnSignOut;
@@ -43,13 +48,13 @@ public class MainActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         checkUserSex();
 
-        al = new ArrayList<>();
+        rowItems = new ArrayList<>();
 
-        arrayAdapter = new ArrayAdapter<>(this, R.layout.item, R.id.helloText, al);
+        cardsAdapter = new ArrayCardsAdapter(this, R.layout.item, rowItems);
 
         flingContainer = findViewById(R.id.frame);
-        flingContainer.setAdapter(arrayAdapter);
-        flingContainer.setFlingListener(new SwipeFling(al, arrayAdapter, this));
+        flingContainer.setAdapter(cardsAdapter);
+        flingContainer.setFlingListener(new SwipeFling(rowItems, cardsAdapter, this));
 
 
         // Optionally add an OnItemClickListener
@@ -141,8 +146,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if(dataSnapshot.exists()){
-                    al.add(dataSnapshot.child("first_name").getValue().toString());
-                    arrayAdapter.notifyDataSetChanged();
+                    Cards item = new Cards(dataSnapshot.getKey(), dataSnapshot.child("first_name").getValue().toString(), dataSnapshot.child("id_facebook").getValue().toString());
+                    rowItems.add(item);
+                    cardsAdapter.notifyDataSetChanged();
                 }
             }
 

@@ -6,15 +6,16 @@ import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.luca.genlike.MainActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SwipeFling implements SwipeFlingAdapterView.onFlingListener {
-    private ArrayList<String> al;
-    private ArrayAdapter<String> arrayAdapter;
+    private List<Cards> al;
+    private ArrayCardsAdapter arrayAdapter;
     private MainActivity mainActivity;
 
     private int i;
 
-    public SwipeFling(ArrayList<String> arrayList, ArrayAdapter<String> arrayAdapter, MainActivity context){
+    public SwipeFling(List<Cards> arrayList, ArrayCardsAdapter arrayAdapter, MainActivity context){
         mainActivity = context;
         this.al = arrayList;
         this.arrayAdapter = arrayAdapter;
