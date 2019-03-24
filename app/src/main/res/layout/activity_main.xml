@@ -19,6 +19,7 @@
 
         <Button
             android:id="@+id/settingsButton"
+            android:onClick="goToSettings"
             android:text="Settings"
             android:layout_weight="1"
             android:layout_width="wrap_content"
