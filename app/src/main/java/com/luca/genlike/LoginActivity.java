@@ -63,16 +63,14 @@ public class LoginActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1; //Used for permissions
     private static final int REQUEST_CODE_LOC = 2;
     private FirebaseAuth mAuth;
-    private FirebaseUser fireUser;
     private CallbackManager callbackManager;
     private AccessToken mAccessToken;
-    private JSONObject mUser;
-    private String gender = "null";
+    private static JSONObject mUser;
     ProgressDialog pd;
     private LocationManager locationManager;
-
-    private String mLatitude;
-    private String mLongitude;
+    private static LoginActivity mLoginActivity;
+    private static String mLatitude;
+    private static String mLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
+        mLoginActivity = this;
         LoginManager.getInstance().logOut();
         checkPermissions();
         //GPS
@@ -97,7 +96,8 @@ public class LoginActivity extends AppCompatActivity {
                     public void onCompleted(JSONObject object, GraphResponse response) {
                         try {
                             mUser = object;
-                            new JsonTask().execute("https://api.genderize.io/?name=" + object.getString("first_name"));
+                            handleFacebookAccessToken(mAccessToken);
+
                         } catch (Exception e) {
                             e.printStackTrace();
                             Utils.debug(LoginActivity.this, e.getMessage());
@@ -140,7 +140,38 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Utils.changeActivity(LoginActivity.this, MainActivity.class);
+                            AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
+                            builder1.setMessage("Précisez votre attirence. D'autres options seront disponible sur la page profil.");
+                            builder1.setCancelable(false);
+                            builder1.setPositiveButton(
+                                    "Je suis attiré par les femmes",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            try {
+                                                trtHomme();
+                                                dialog.cancel();
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    });
+
+                            builder1.setNegativeButton(
+                                    "Je suis attiré par les hommes",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            try {
+                                                trtFemme();
+                                                dialog.cancel();
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+
+                            AlertDialog alert11 = builder1.create();
+                            alert11.show();
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
@@ -152,14 +183,14 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    /*@Override
+    @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser user = mAuth.getCurrentUser();
         if(user != null){
             Utils.changeActivity(LoginActivity.this, MainActivity.class);
         }
-    }*/
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -309,66 +340,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
-            try {
-                JSONObject object = new JSONObject(result);
-                if(object.getString("gender").equals("male")){
-                    gender = "Male";
-                }else if(object.getString("gender").equals("female")){
-                    gender = "Female";
-                }else{
-                    AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
-                    builder1.setMessage("Votre sexe n'as pas été trouvé. D'autres options seront disponible sur la page profil.");
-                    builder1.setCancelable(false);
-                    builder1.setPositiveButton(
-                            "Je suis un homme",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                    gender = "Homme";
-                                }
-                            });
 
-                    builder1.setNegativeButton(
-                            "Je suis une femme",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                    gender = "Femme";
-                                }
-                            });
-
-                    AlertDialog alert11 = builder1.create();
-                    alert11.show();
-                }
-
-                String userID = mAuth.getCurrentUser().getUid();
-                //FIRST_NAME
-                DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("first_name");
-                db_first_name.setValue(mUser.getString("first_name"));
-                //LAST_NAME
-                DatabaseReference db_last_name = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("last_name");
-                db_last_name.setValue(mUser.getString("last_name"));
-                //ID_FACEBOOK
-                DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("id_facebook");
-                db_id_facebook.setValue(mUser.getString("id"));
-                //YEAR OLD
-                String[] birthday = mUser.getString("birthday").split("/");
-                int age = Utils.getAge(birthday[2], birthday[1], birthday[0]);
-                DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("age");
-                db_age.setValue(age);
-                //POSITION
-                DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("latitude");
-                db_latitude.setValue(mLatitude);
-                DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("longitude");
-                db_longitude.setValue(mLongitude);
-
-                handleFacebookAccessToken(mAccessToken);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -404,6 +376,58 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public static void trtHomme() throws JSONException {
+        FirebaseAuth authL = FirebaseAuth.getInstance();
+        String userID = authL.getCurrentUser().getUid();
+        //FIRST_NAME
+        DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("first_name");
+        db_first_name.setValue(mUser.getString("first_name"));
+        //LAST_NAME
+        DatabaseReference db_last_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("last_name");
+        db_last_name.setValue(mUser.getString("last_name"));
+        //ID_FACEBOOK
+        DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("id_facebook");
+        db_id_facebook.setValue(mUser.getString("id"));
+        //YEAR OLD
+        String[] birthday = mUser.getString("birthday").split("/");
+        int age = Utils.getAge(birthday[2], birthday[1], birthday[0]);
+        DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("age");
+        db_age.setValue(age);
+        //POSITION
+        DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("latitude");
+        db_latitude.setValue(mLatitude);
+        DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("longitude");
+        db_longitude.setValue(mLongitude);
+        Utils.changeActivity(mLoginActivity, MainActivity.class);
+
+    }
+
+    public static void trtFemme() throws JSONException {
+        FirebaseAuth authL = FirebaseAuth.getInstance();
+        String userID = authL.getCurrentUser().getUid();
+        //FIRST_NAME
+        DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("first_name");
+        db_first_name.setValue(mUser.getString("first_name"));
+        //LAST_NAME
+        DatabaseReference db_last_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("last_name");
+        db_last_name.setValue(mUser.getString("last_name"));
+        //ID_FACEBOOK
+        DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("id_facebook");
+        db_id_facebook.setValue(mUser.getString("id"));
+        //YEAR OLD
+        String[] birthday = mUser.getString("birthday").split("/");
+        int age = Utils.getAge(birthday[2], birthday[1], birthday[0]);
+        DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("age");
+        db_age.setValue(age);
+        //POSITION
+        DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("latitude");
+        db_latitude.setValue(mLatitude);
+        DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("longitude");
+        db_longitude.setValue(mLongitude);
+        Utils.changeActivity(mLoginActivity, MainActivity.class);
+
     }
 
 }

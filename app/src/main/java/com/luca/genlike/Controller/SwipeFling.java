@@ -2,6 +2,8 @@ package com.luca.genlike.Controller;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.luca.genlike.MainActivity;
 
@@ -12,6 +14,7 @@ public class SwipeFling implements SwipeFlingAdapterView.onFlingListener {
     private List<Cards> al;
     private ArrayCardsAdapter arrayAdapter;
     private MainActivity mainActivity;
+    private DatabaseReference usersDB;
 
     private int i;
 
@@ -31,6 +34,9 @@ public class SwipeFling implements SwipeFlingAdapterView.onFlingListener {
 
     @Override
     public void onLeftCardExit(Object o) {
+        Cards obj = (Cards) o;
+        String userId = obj.getUserID();
+
         Toast.makeText(mainActivity, "left", Toast.LENGTH_SHORT).show();
     }
 

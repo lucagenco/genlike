@@ -20,6 +20,7 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
 
     public ArrayCardsAdapter(Context context, int ressourceID, List<Cards> items){
         super(context, ressourceID, items);
+        this.context = context;
     }
 
     public View getView(int position, View convertView, ViewGroup parent){
