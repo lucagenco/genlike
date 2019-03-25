@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/backWhite"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
+        android:background="@color/backWhite"
         android:layout_height="wrap_content">
         <Button
             android:id="@+id/logOut"
@@ -29,7 +31,7 @@
 
     <com.lorentzos.flingswipe.SwipeFlingAdapterView
         android:id="@+id/frame"
-        android:background="#ffeee9e2"
+        android:background="@color/backWhite"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:rotation_degrees="15.5"

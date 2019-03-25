@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/backWhite"
     tools:context=".SettingsActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -27,6 +28,7 @@
         android:layout_height="wrap_content" />
 
     <android.support.v7.widget.AppCompatButton
+        android:onClick="goToChangeSettings"
         android:id="@+id/modifyProfile"
         android:layout_gravity="center"
         android:layout_marginTop="35dp"

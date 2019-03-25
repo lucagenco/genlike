@@ -1,10 +1,12 @@
 package com.luca.genlike;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -81,5 +83,11 @@ public class SettingsActivity extends AppCompatActivity {
     private URL buildUrlProfile(String id_facebook) throws MalformedURLException {
         URL profile_picture = new URL("https://graph.facebook.com/"+ id_facebook+"/picture?width=300&height=300");
         return profile_picture;
+    }
+
+    public void goToChangeSettings(View view){
+        Intent intent = new Intent(SettingsActivity.this, ChangeSettings.class);
+        intent.putExtra("userSex", userSex);
+        startActivity(intent);
     }
 }

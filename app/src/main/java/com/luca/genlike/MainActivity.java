@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         usersDB = FirebaseDatabase.getInstance().getReference().child("Users");
         currentUserId = mUser.getUid();
         checkUserSex();
-        Utils.debug(MainActivity.this, mUser.getUid());
         rowItems = new ArrayList<>();
 
         cardsAdapter = new ArrayCardsAdapter(this, R.layout.item, rowItems);

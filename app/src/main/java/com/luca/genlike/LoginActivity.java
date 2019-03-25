@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
@@ -43,6 +44,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.luca.genlike.Controller.SessionManager;
 import com.luca.genlike.Http.MyRequest;
 import com.luca.genlike.Model.VolleySingleton;
 import com.luca.genlike.Utils.GenderDialog;
@@ -71,11 +73,13 @@ public class LoginActivity extends AppCompatActivity {
     private static LoginActivity mLoginActivity;
     private static String mLatitude;
     private static String mLongitude;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        sessionManager = new SessionManager(LoginActivity.this);
         callbackManager = CallbackManager.Factory.create();
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
@@ -140,38 +144,54 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
-                            builder1.setMessage("Précisez votre attirence. D'autres options seront disponible sur la page profil.");
-                            builder1.setCancelable(false);
-                            builder1.setPositiveButton(
-                                    "Je suis attiré par les femmes",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            try {
-                                                trtHomme();
-                                                dialog.cancel();
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
+                            if(sessionManager.getSex().equals("")){
+                                AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
+                                builder1.setMessage("Précisez votre attirence. D'autres options seront disponible sur la page profil.");
+                                builder1.setCancelable(false);
+                                builder1.setPositiveButton(
+                                        "Je suis attiré par les femmes",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                try {
+                                                    sessionManager.setSex("Male");
+                                                    Utils.debug(LoginActivity.this, "lol");
+                                                    trtHomme();
+                                                    dialog.cancel();
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+
                                             }
+                                        });
 
-                                        }
-                                    });
-
-                            builder1.setNegativeButton(
-                                    "Je suis attiré par les hommes",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            try {
-                                                trtFemme();
-                                                dialog.cancel();
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
+                                builder1.setNegativeButton(
+                                        "Je suis attiré par les hommes",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                try {
+                                                    sessionManager.setSex("Female");
+                                                    trtFemme();
+                                                    dialog.cancel();
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                AlertDialog alert11 = builder1.create();
+                                alert11.show();
+                            }else{
+                                try{
+                                    if(sessionManager.getSex().equals("Male")){
+                                        trtHomme();
+                                    }else if(sessionManager.getSex().equals("Female")){
+                                        trtFemme();
+                                    }
+                                }
+                                catch(Exception e){
 
-                            AlertDialog alert11 = builder1.create();
-                            alert11.show();
+                                }
+
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
