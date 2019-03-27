@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.luca.genlike.Utils.Utils;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
@@ -57,17 +58,48 @@ public class SettingsActivity extends AppCompatActivity {
         dbUsers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (pd.isShowing()){
-                    pd.dismiss();
-                }
+
                 if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0){
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
-                    try {
-                        Picasso.with(SettingsActivity.this).load(buildUrlProfile(map.get("id_facebook").toString()).toString()).into(profileImage);
-                        nameAndAge.setText(map.get("first_name").toString() + ", " + map.get("age").toString());
-                    } catch (Exception e) {
-                        Log.d("YOO", e.getMessage());
+                    if(map.get("profile_image").toString().equals("facebook_image")){
+                        try {
+                            Picasso.with(SettingsActivity.this).load(Utils.buildUrlProfile(map.get("id_facebook").toString()).toString()).into(profileImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    if (pd.isShowing()){
+                                        pd.dismiss();
+                                    }
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+                        } catch (Exception e) {
+                            Log.d("YOO", e.getMessage());
+                        }
                     }
+                    else{
+                        try {
+                            Picasso.with(SettingsActivity.this).load(map.get("profile_image").toString()).into(profileImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    if (pd.isShowing()){
+                                        pd.dismiss();
+                                    }
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+                        } catch (Exception e) {
+                            Log.d("YOO", e.getMessage());
+                        }
+                    }
+                    nameAndAge.setText(map.get("first_name").toString() + ", " + map.get("age").toString());
                 }
             }
 

@@ -143,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                                 pd.dismiss();
                             }
                             // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            final FirebaseUser user = mAuth.getCurrentUser();
                             if(sessionManager.getSex().equals("")){
                                 AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
                                 builder1.setMessage("Précisez votre attirence. D'autres options seront disponible sur la page profil.");
@@ -155,6 +155,8 @@ public class LoginActivity extends AppCompatActivity {
                                                 try {
                                                     sessionManager.setSex("Male");
                                                     Utils.debug(LoginActivity.this, "lol");
+                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(user.getUid()).child("profile_image");
+                                                    db_profile_image.setValue("facebook_image");
                                                     trtHomme();
                                                     dialog.cancel();
                                                 } catch (JSONException e) {
@@ -170,6 +172,8 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 try {
                                                     sessionManager.setSex("Female");
+                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(user.getUid()).child("profile_image");
+                                                    db_profile_image.setValue("facebook_image");
                                                     trtFemme();
                                                     dialog.cancel();
                                                 } catch (JSONException e) {
@@ -420,6 +424,7 @@ public class LoginActivity extends AppCompatActivity {
         db_latitude.setValue(mLatitude);
         DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("longitude");
         db_longitude.setValue(mLongitude);
+
         Utils.changeActivity(mLoginActivity, MainActivity.class);
 
     }
@@ -446,6 +451,8 @@ public class LoginActivity extends AppCompatActivity {
         db_latitude.setValue(mLatitude);
         DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("longitude");
         db_longitude.setValue(mLongitude);
+        DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("profile_image");
+        db_profile_image.setValue("facebook_image");
         Utils.changeActivity(mLoginActivity, MainActivity.class);
 
     }

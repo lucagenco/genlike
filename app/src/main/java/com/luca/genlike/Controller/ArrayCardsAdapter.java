@@ -1,5 +1,6 @@
 package com.luca.genlike.Controller;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.luca.genlike.ChangeSettings;
 import com.luca.genlike.R;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
@@ -17,10 +20,15 @@ import java.util.List;
 
 public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
     private Context context;
+    ProgressDialog pd;
 
     public ArrayCardsAdapter(Context context, int ressourceID, List<Cards> items){
         super(context, ressourceID, items);
         this.context = context;
+        pd = new ProgressDialog(this.context);
+        pd.setMessage("Chargement des données...");
+        pd.setCancelable(false);
+        pd.show();
     }
 
     public View getView(int position, View convertView, ViewGroup parent){
@@ -33,7 +41,36 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
 
         txtFirst_name.setText(card_item.getFirst_name());
         try {
-            Picasso.with(this.context).load(buildUrlProfile(card_item.getId_facebook()).toString()).into(imgProfile);
+            if(card_item.getProfile_image().equals("facebook_image")){
+                Picasso.with(this.context).load(buildUrlProfile(card_item.getId_facebook()).toString()).into(imgProfile, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        if (pd.isShowing()){
+                            pd.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+            }
+            else{
+                Picasso.with(this.context).load(card_item.getProfile_image()).into(imgProfile, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        if (pd.isShowing()){
+                            pd.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

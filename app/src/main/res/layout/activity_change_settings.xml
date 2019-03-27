@@ -46,10 +46,11 @@
                     android:onClick="pickImageProfile"
                     android:id="@+id/pickImage"
                     android:layout_gravity="center"
+                    android:textSize="12dp"
                     style="@style/Widget.AppCompat.Button.Colored"
                     android:text="  prendre photo"
                     android:drawableLeft="@drawable/ic_filter_white_24dp"
-                    android:padding="12dp"
+                    android:padding="5dp"
                     android:background="@color/colorPrimaryDark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
@@ -62,7 +63,8 @@
                     android:layout_marginLeft="10dp"
                     android:text="  image par défaut"
                     android:drawableLeft="@drawable/ic_image_white_24dp"
-                    android:padding="12dp"
+                    android:textSize="12dp"
+                    android:padding="5dp"
                     android:background="@color/colorPrimaryDark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
