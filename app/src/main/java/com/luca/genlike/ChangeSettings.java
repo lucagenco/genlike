@@ -84,11 +84,11 @@ public class ChangeSettings extends AppCompatActivity {
         spinnerAttirance.attachDataSource(datasetAttirance);
 
         sessionManager = new SessionManager(ChangeSettings.this);
-        userSex = getIntent().getExtras().getString("userSex", "");
+        userSex = sessionManager.getSex();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         userID = mUser.getUid();
-        dbUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(userSex).child(userID);
+        dbUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
         if(userSex.equals("Male")){
             spinnerAttirance.setSelectedIndex(1);
         }else if(userSex.equals("Female")){

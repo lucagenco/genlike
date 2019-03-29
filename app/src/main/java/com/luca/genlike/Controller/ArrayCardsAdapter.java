@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.luca.genlike.ChangeSettings;
 import com.luca.genlike.R;
+import com.luca.genlike.Utils.Utils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -25,10 +26,7 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
     public ArrayCardsAdapter(Context context, int ressourceID, List<Cards> items){
         super(context, ressourceID, items);
         this.context = context;
-        pd = new ProgressDialog(this.context);
-        pd.setMessage("Chargement des données...");
-        pd.setCancelable(false);
-        pd.show();
+
     }
 
     public View getView(int position, View convertView, ViewGroup parent){
@@ -42,27 +40,14 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
         txtFirst_name.setText(card_item.getFirst_name());
         try {
             if(card_item.getProfile_image().equals("facebook_image")){
-                Picasso.with(this.context).load(buildUrlProfile(card_item.getId_facebook()).toString()).into(imgProfile, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        if (pd.isShowing()){
-                            pd.dismiss();
-                        }
-                    }
-
-                    @Override
-                    public void onError() {
-
-                    }
-                });
+                Picasso.with(this.context).load(buildUrlProfile(card_item.getId_facebook()).toString()).into(imgProfile);
             }
             else{
                 Picasso.with(this.context).load(card_item.getProfile_image()).into(imgProfile, new Callback() {
                     @Override
                     public void onSuccess() {
-                        if (pd.isShowing()){
-                            pd.dismiss();
-                        }
+
+
                     }
 
                     @Override

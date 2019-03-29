@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
     private static String mLatitude;
     private static String mLongitude;
     private SessionManager sessionManager;
+    private static String mUserSex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,9 +156,10 @@ public class LoginActivity extends AppCompatActivity {
                                                 try {
                                                     sessionManager.setSex("Male");
                                                     Utils.debug(LoginActivity.this, "lol");
-                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(user.getUid()).child("profile_image");
+                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("profile_image");
                                                     db_profile_image.setValue("facebook_image");
-                                                    trtHomme();
+                                                    mUserSex = "Male";
+                                                    trtConnexion();
                                                     dialog.cancel();
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
@@ -172,9 +174,10 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 try {
                                                     sessionManager.setSex("Female");
-                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(user.getUid()).child("profile_image");
+                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("profile_image");
                                                     db_profile_image.setValue("facebook_image");
-                                                    trtFemme();
+                                                    mUserSex = "Female";
+                                                    trtConnexion();
                                                     dialog.cancel();
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
@@ -186,9 +189,11 @@ public class LoginActivity extends AppCompatActivity {
                             }else{
                                 try{
                                     if(sessionManager.getSex().equals("Male")){
-                                        trtHomme();
+                                        mUserSex = "Male";
+                                        trtConnexion();
                                     }else if(sessionManager.getSex().equals("Female")){
-                                        trtFemme();
+                                        mUserSex = "Female";
+                                        trtConnexion();
                                     }
                                 }
                                 catch(Exception e){
@@ -210,8 +215,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if(user != null){
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
             Utils.changeActivity(LoginActivity.this, MainActivity.class);
         }
     }
@@ -402,57 +407,32 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public static void trtHomme() throws JSONException {
+    public static void trtConnexion() throws JSONException {
         FirebaseAuth authL = FirebaseAuth.getInstance();
         String userID = authL.getCurrentUser().getUid();
         //FIRST_NAME
-        DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("first_name");
+        DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("first_name");
         db_first_name.setValue(mUser.getString("first_name"));
         //LAST_NAME
-        DatabaseReference db_last_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("last_name");
+        DatabaseReference db_last_name = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("last_name");
         db_last_name.setValue(mUser.getString("last_name"));
         //ID_FACEBOOK
-        DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("id_facebook");
+        DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("id_facebook");
         db_id_facebook.setValue(mUser.getString("id"));
         //YEAR OLD
         String[] birthday = mUser.getString("birthday").split("/");
         int age = Utils.getAge(birthday[2], birthday[1], birthday[0]);
-        DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("age");
+        DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("age");
         db_age.setValue(age);
         //POSITION
-        DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("latitude");
+        DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("latitude");
         db_latitude.setValue(mLatitude);
-        DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("longitude");
+        DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("longitude");
         db_longitude.setValue(mLongitude);
+        //GENDER
+        DatabaseReference db_gender = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("gender");
+        db_gender.setValue(mUserSex);
 
-        Utils.changeActivity(mLoginActivity, MainActivity.class);
-
-    }
-
-    public static void trtFemme() throws JSONException {
-        FirebaseAuth authL = FirebaseAuth.getInstance();
-        String userID = authL.getCurrentUser().getUid();
-        //FIRST_NAME
-        DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("first_name");
-        db_first_name.setValue(mUser.getString("first_name"));
-        //LAST_NAME
-        DatabaseReference db_last_name = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("last_name");
-        db_last_name.setValue(mUser.getString("last_name"));
-        //ID_FACEBOOK
-        DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("id_facebook");
-        db_id_facebook.setValue(mUser.getString("id"));
-        //YEAR OLD
-        String[] birthday = mUser.getString("birthday").split("/");
-        int age = Utils.getAge(birthday[2], birthday[1], birthday[0]);
-        DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("age");
-        db_age.setValue(age);
-        //POSITION
-        DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("latitude");
-        db_latitude.setValue(mLatitude);
-        DatabaseReference db_longitude = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID).child("longitude");
-        db_longitude.setValue(mLongitude);
-        DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID).child("profile_image");
-        db_profile_image.setValue("facebook_image");
         Utils.changeActivity(mLoginActivity, MainActivity.class);
 
     }

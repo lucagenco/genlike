@@ -49,11 +49,10 @@ public class SettingsActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profile_image);
         nameAndAge = findViewById(R.id.nameAndYear);
 
-        userSex = getIntent().getExtras().getString("userSex", "");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         userID = mUser.getUid();
-        dbUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(userSex).child(userID);
+        dbUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
 
         dbUsers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -61,6 +60,9 @@ public class SettingsActivity extends AppCompatActivity {
 
                 if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0){
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
+                    if(map.get("gender") != null){
+                        userSex = map.get("gender").toString();
+                    }
                     if(map.get("profile_image").toString().equals("facebook_image")){
                         try {
                             Picasso.with(SettingsActivity.this).load(Utils.buildUrlProfile(map.get("id_facebook").toString()).toString()).into(profileImage, new Callback() {
@@ -118,8 +120,6 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void goToChangeSettings(View view){
-        Intent intent = new Intent(SettingsActivity.this, ChangeSettings.class);
-        intent.putExtra("userSex", userSex);
-        startActivity(intent);
+        Utils.changeActivity(SettingsActivity.this, ChangeSettings.class);
     }
 }
