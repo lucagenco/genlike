@@ -9,6 +9,9 @@ public class SessionManager {
     public static final String PREFS_NAME = "app_prefs";
     private final static int PRIVATE_MODE = 0;
     private final static String SEX = "sex";
+    private final static String IS_LOGGED = "is_logged";
+    private final static String LATITUDE = "latitude";
+    private final static String LONGITUDE = "longitude";
     private Context context;
 
 
@@ -21,6 +24,25 @@ public class SessionManager {
     public void setSex(String sex){
         editor.putString(SEX, sex);
         editor.commit();
+    }
+
+    public void setIsLogged(boolean isLoggeded){
+        editor.putBoolean(IS_LOGGED, isLoggeded);
+        editor.commit();
+    }
+
+    public void setPosition(String latitude, String longitude){
+        editor.putString(LATITUDE, latitude);
+        editor.putString(LONGITUDE, longitude);
+        editor.commit();
+    }
+
+    public String getPosition(){
+        return prefs.getString(LATITUDE, "") + "," + prefs.getString(LONGITUDE, "");
+    }
+
+    public boolean isLogged(){
+        return prefs.getBoolean(IS_LOGGED, false);
     }
 
     public String getSex(){

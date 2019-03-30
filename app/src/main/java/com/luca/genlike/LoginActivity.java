@@ -159,6 +159,8 @@ public class LoginActivity extends AppCompatActivity {
                                                     DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("profile_image");
                                                     db_profile_image.setValue("facebook_image");
                                                     mUserSex = "Male";
+                                                    sessionManager.setIsLogged(true);
+                                                    sessionManager.setPosition(mLatitude, mLongitude);
                                                     trtConnexion();
                                                     dialog.cancel();
                                                 } catch (JSONException e) {
@@ -177,6 +179,8 @@ public class LoginActivity extends AppCompatActivity {
                                                     DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("profile_image");
                                                     db_profile_image.setValue("facebook_image");
                                                     mUserSex = "Female";
+                                                    sessionManager.setIsLogged(true);
+                                                    sessionManager.setPosition(mLatitude, mLongitude);
                                                     trtConnexion();
                                                     dialog.cancel();
                                                 } catch (JSONException e) {
@@ -190,9 +194,13 @@ public class LoginActivity extends AppCompatActivity {
                                 try{
                                     if(sessionManager.getSex().equals("Male")){
                                         mUserSex = "Male";
+                                        sessionManager.setIsLogged(true);
+                                        sessionManager.setPosition(mLatitude, mLongitude);
                                         trtConnexion();
                                     }else if(sessionManager.getSex().equals("Female")){
                                         mUserSex = "Female";
+                                        sessionManager.setIsLogged(true);
+                                        sessionManager.setPosition(mLatitude, mLongitude);
                                         trtConnexion();
                                     }
                                 }
@@ -212,14 +220,15 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    @Override
+    /*@Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
+        if(currentUser != null && sessionManager.isLogged()){
+            sessionManager.setIsLogged(true);
             Utils.changeActivity(LoginActivity.this, MainActivity.class);
         }
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -433,6 +442,9 @@ public class LoginActivity extends AppCompatActivity {
         DatabaseReference db_gender = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("gender");
         db_gender.setValue(mUserSex);
 
+        //DESCRIPTION
+        DatabaseReference db_description = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("description");
+        db_description.setValue("");
         Utils.changeActivity(mLoginActivity, MainActivity.class);
 
     }

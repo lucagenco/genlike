@@ -20,6 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.luca.genlike.Controller.ArrayCardsAdapter;
 import com.luca.genlike.Controller.Cards;
+import com.luca.genlike.Controller.SessionManager;
 import com.luca.genlike.Controller.SwipeFling;
 import com.luca.genlike.Utils.Utils;
 
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private String currentUserId;
     List<Cards> rowItems;
     private DatabaseReference usersDB;
-
+    private SessionManager sessionManager;
     //WIDGET
     private Button btnSignOut;
 
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         currentUserId = mUser.getUid();
         checkUserSex();
         rowItems = new ArrayList<>();
-
+        sessionManager = new SessionManager(MainActivity.this);
         cardsAdapter = new ArrayCardsAdapter(this, R.layout.item, rowItems);
 
         flingContainer = findViewById(R.id.frame);
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mAuth.signOut();
+                sessionManager.setIsLogged(false);
                 Utils.changeActivity(MainActivity.this, LoginActivity.class);
             }
         });
@@ -161,14 +163,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if(dataSnapshot.exists() && !dataSnapshot.child("connections").child("nope").hasChild(currentUserId) && !dataSnapshot.child("connections").child("yeps").hasChild(currentUserId) && dataSnapshot.child("gender").getValue().toString().equals(oppositeUserSex)){
-                    if(dataSnapshot.hasChild("profile_image")){
-                        Cards item = new Cards(dataSnapshot.getKey(), dataSnapshot.child("first_name").getValue().toString(), dataSnapshot.child("id_facebook").getValue().toString(), dataSnapshot.child("age").getValue().toString(), dataSnapshot.child("profile_image").getValue().toString());
-                        rowItems.add(item);
-                    }
-                    else {
-                        Cards item = new Cards(dataSnapshot.getKey(), dataSnapshot.child("first_name").getValue().toString(), dataSnapshot.child("id_facebook").getValue().toString(), dataSnapshot.child("age").getValue().toString(), "facebook_image");
-                        rowItems.add(item);
-                    }
+                    Cards item = new Cards(dataSnapshot.getKey(), dataSnapshot.child("first_name").getValue().toString(), dataSnapshot.child("id_facebook").getValue().toString(), dataSnapshot.child("age").getValue().toString(), dataSnapshot.child("profile_image").getValue().toString(), dataSnapshot.child("description").getValue().toString()
+                    , dataSnapshot.child("latitude").getValue().toString(), dataSnapshot.child("longitude").getValue().toString());
+                    rowItems.add(item);
                     cardsAdapter.notifyDataSetChanged();
                 }
             }

@@ -155,7 +155,7 @@ public class ChangeSettings extends AppCompatActivity {
 
     public void applyChange(View v){
         if(!etDescription.getText().toString().equals("")){
-            DatabaseReference dbInsertDesc = FirebaseDatabase.getInstance().getReference().child("Users").child(userSex).child(userID).child("description");
+            DatabaseReference dbInsertDesc = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("description");
             dbInsertDesc.setValue(etDescription.getText().toString());
         }
 
@@ -168,6 +168,7 @@ public class ChangeSettings extends AppCompatActivity {
                 pathFrom.removeValue();
                 sessionManager.setSex("Female");
                 mAuth.signOut();
+                sessionManager.setIsLogged(false);
                 Utils.changeActivity(ChangeSettings.this, LoginActivity.class);
             }
         }
@@ -180,6 +181,7 @@ public class ChangeSettings extends AppCompatActivity {
                 pathFrom.removeValue();
                 sessionManager.setSex("Male");
                 mAuth.signOut();
+                sessionManager.setIsLogged(false);
                 Utils.changeActivity(ChangeSettings.this, LoginActivity.class);
             }
         }

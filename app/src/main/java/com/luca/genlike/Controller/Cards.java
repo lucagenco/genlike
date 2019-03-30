@@ -6,13 +6,19 @@ public class Cards {
     private String id_facebook;
     private String age;
     private String profile_image;
+    private String description;
+    private String latitude;
+    private String longitude;
 
-    public Cards(String userID, String first_name, String id_facebook, String age, String profile_image) {
+    public Cards(String userID, String first_name, String id_facebook, String age, String profile_image, String description, String latitude, String longitude) {
         this.userID = userID;
         this.first_name = first_name;
         this.id_facebook = id_facebook;
         this.age = age;
         this.profile_image = profile_image;
+        this.description = description;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public String getUserID() {
@@ -53,5 +59,29 @@ public class Cards {
 
     public void setProfile_image(String profile_image) {
         this.profile_image = profile_image;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 }
