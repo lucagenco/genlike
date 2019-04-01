@@ -33,8 +33,40 @@
         android:id="@+id/frame"
         android:background="@color/backWhite"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="450dp"
         app:rotation_degrees="15.5"
         tools:context=".MyActivity" />
+
+    <LinearLayout
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.AppCompatButton
+            android:onClick="selectLeft"
+            android:layout_gravity="center"
+            android:textSize="12dp"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:text="  Nope"
+            android:drawableLeft="@drawable/ic_thumb_down_white_24dp"
+            android:padding="5dp"
+            android:background="@color/colorPrimaryDark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:onClick="selectRight"
+            android:layout_marginLeft="30dp"
+            android:layout_gravity="center"
+            android:textSize="12dp"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:text="  Like"
+            android:drawableLeft="@drawable/ic_thumb_up_white_24dp"
+            android:padding="5dp"
+            android:background="@color/colorPrimaryDark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </LinearLayout>

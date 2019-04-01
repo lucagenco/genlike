@@ -45,10 +45,12 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
         TextView txtFirst_name = convertView.findViewById(R.id.name);
         ImageView imgProfile = convertView.findViewById(R.id.profileImage);
         TextView txtDescription = convertView.findViewById(R.id.txtDescription);
+        TextView txtPosition = convertView.findViewById(R.id.txtPosition);
         String[] positions = sessionManager.getPosition().split(",");
         double res = FlatEarthDist.distance(Double.parseDouble(positions[0]), Double.parseDouble(positions[1]), Double.parseDouble(card_item.getLatitude()), Double.parseDouble(card_item.getLongitude()));
-        Utils.debug(context, String.valueOf(res/1000));
+        int resRound = (int)Math.round(res/1000);
 
+        txtPosition.setText(resRound + " km     ");
         txtFirst_name.setText(card_item.getFirst_name() + ", " + card_item.getAge());
         if(card_item.getDescription().equals("")){
             txtDescription.setText("Aucune description...");

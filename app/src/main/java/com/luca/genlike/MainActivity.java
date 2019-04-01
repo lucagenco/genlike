@@ -113,6 +113,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void selectRight(View v){
+        flingContainer.getTopCardListener().selectRight();
+    }
+
+    public void selectLeft(View v){
+        flingContainer.getTopCardListener().selectLeft();
+    }
+
     private void isConnectionMatch(final String userId) {
         DatabaseReference currentUserConnectionDb = usersDB.child(currentUserId).child("connections").child("yeps").child(userId);
         currentUserConnectionDb.addValueEventListener(new ValueEventListener() {
