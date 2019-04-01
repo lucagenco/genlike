@@ -2,8 +2,10 @@ package com.luca.genlike;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -41,12 +43,14 @@ public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     //WIDGET
     private Button btnSignOut;
+    private BottomNavigationView bottomNavigationView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bottomNavigationView = findViewById(R.id.bottomMenu);
         btnSignOut = findViewById(R.id.logOut);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -91,6 +95,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScroll(float v) {
 
+            }
+        });
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.navigation_home:bottomNavigationView.setSelectedItemId(1);;
+                }
+
+                return true;
             }
         });
 

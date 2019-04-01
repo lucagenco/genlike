@@ -69,4 +69,23 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="9"
+        android:id="@+id/fragmentContainer"
+        />
+
+    <android.support.design.widget.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottomMenu"
+        android:layout_weight="1"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/navigation"
+        />
+
+
+
 </LinearLayout>

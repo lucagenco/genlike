@@ -49,8 +49,12 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
         String[] positions = sessionManager.getPosition().split(",");
         double res = FlatEarthDist.distance(Double.parseDouble(positions[0]), Double.parseDouble(positions[1]), Double.parseDouble(card_item.getLatitude()), Double.parseDouble(card_item.getLongitude()));
         int resRound = (int)Math.round(res/1000);
+        if(resRound < 1){
+            txtPosition.setText("Moins d'un km     ");
+        }else{
+            txtPosition.setText(resRound + " km     ");
+        }
 
-        txtPosition.setText(resRound + " km     ");
         txtFirst_name.setText(card_item.getFirst_name() + ", " + card_item.getAge());
         if(card_item.getDescription().equals("")){
             txtDescription.setText("Aucune description...");
