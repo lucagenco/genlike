@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottomMenu);
-        btnSignOut = findViewById(R.id.logOut);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         usersDB = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         rowItems = new ArrayList<>();
         sessionManager = new SessionManager(MainActivity.this);
         cardsAdapter = new ArrayCardsAdapter(this, R.layout.item, rowItems);
-
+        bottomNavigationView.setSelectedItemId(R.id.navigation_like);
         flingContainer = findViewById(R.id.frame);
         flingContainer.setAdapter(cardsAdapter);
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
@@ -102,9 +101,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.navigation_home:bottomNavigationView.setSelectedItemId(1);;
+                    case R.id.navigation_profile:Utils.changeActivity(MainActivity.this, SettingsActivity.class);break;
                 }
-
                 return true;
             }
         });
@@ -115,15 +113,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
                 Toast.makeText(MainActivity.this, "clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signOut();
-                sessionManager.setIsLogged(false);
-                Utils.changeActivity(MainActivity.this, LoginActivity.class);
             }
         });
     }
@@ -217,6 +206,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void goToSettings(View v){
         Utils.changeActivity(MainActivity.this, SettingsActivity.class);
+    }
+
+    public void logOut(){
+        mAuth.signOut();
+        sessionManager.setIsLogged(false);
+        Utils.changeActivity(MainActivity.this, LoginActivity.class);
     }
 
 }

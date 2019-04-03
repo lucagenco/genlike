@@ -220,7 +220,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    /*@Override
+    @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -228,7 +228,7 @@ public class LoginActivity extends AppCompatActivity {
             sessionManager.setIsLogged(true);
             Utils.changeActivity(LoginActivity.this, MainActivity.class);
         }
-    }*/
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

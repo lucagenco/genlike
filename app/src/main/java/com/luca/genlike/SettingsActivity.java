@@ -3,9 +3,11 @@ package com.luca.genlike;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -36,6 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageView profileImage;
     private TextView nameAndAge;
     ProgressDialog pd;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         userID = mUser.getUid();
         dbUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
+        bottomNavigationView = findViewById(R.id.bottomMenu);
 
         dbUsers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -111,6 +115,15 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.navigation_like:Utils.changeActivity(SettingsActivity.this, MainActivity.class);break;
+                }
+                return true;
+            }
+        });
 
     }
 
