@@ -120,6 +120,7 @@ public class SettingsActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.navigation_like:Utils.changeActivity(SettingsActivity.this, MainActivity.class);break;
+                    case R.id.navigation_matchs: Utils.changeActivity(SettingsActivity.this, MatchActivity.class);break;
                 }
                 return true;
             }

@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.navigation_profile:Utils.changeActivity(MainActivity.this, SettingsActivity.class);break;
+                    case R.id.navigation_matchs: Utils.changeActivity(MainActivity.this, MatchActivity.class);break;
                 }
                 return true;
             }
