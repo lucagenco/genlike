@@ -23,7 +23,6 @@ import java.util.List;
 
 public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
     private Context context;
-    ProgressDialog pd;
     private FlatEarthDist flatEarthDist;
     private SessionManager sessionManager;
 

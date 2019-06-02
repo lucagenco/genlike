@@ -40,6 +40,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesViewHolders> {
     @Override
     public void onBindViewHolder(@NonNull MatchesViewHolders holder, int position) {
         holder.mMatchName.setText(matchesList.get(position).getFirst_name());
+        holder.mMatchId.setText(matchesList.get(position).getUserID());
         if(matchesList.get(position).getProfile_image().equals("facebook_image")){
             try {
                 Picasso.with(this.context).load(buildUrlProfile(matchesList.get(position).getId_facebook()).toString()).into(holder.mImage);

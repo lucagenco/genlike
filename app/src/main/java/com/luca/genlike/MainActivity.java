@@ -1,4 +1,5 @@
 package com.luca.genlike;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     //WIDGET
     private Button btnSignOut;
     private BottomNavigationView bottomNavigationView;
+    ProgressDialog pd;
 
 
     @Override
@@ -55,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         usersDB = FirebaseDatabase.getInstance().getReference().child("Users");
         currentUserId = mUser.getUid();
+        pd = new ProgressDialog(MainActivity.this);
+        pd.setMessage("Chargement des données...");
+        pd.setCancelable(false);
+        pd.show();
+
         checkUserSex();
         rowItems = new ArrayList<>();
         sessionManager = new SessionManager(MainActivity.this);
@@ -74,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
                 Cards obj = (Cards) o;
                 String userId = obj.getUserID();
                 usersDB.child(userId).child("connections").child("nope").child(currentUserId).setValue(true);
-                Toast.makeText(MainActivity.this, "left", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -83,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 String userId = obj.getUserID();
                 usersDB.child(userId).child("connections").child("yeps").child(currentUserId).setValue(true);
                 isConnectionMatch(userId);
-                Toast.makeText(MainActivity.this, "right", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -133,8 +138,13 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     Utils.debug(MainActivity.this, "new Connection");
-                    usersDB.child(currentUserId).child("connections").child("matches").child(dataSnapshot.getKey()).setValue(true);
-                    usersDB.child(dataSnapshot.getKey()).child("connections").child("matches").child(currentUserId).setValue(true);
+                    String key = FirebaseDatabase.getInstance().getReference().child("Chat").push().getKey();
+
+                    //usersDB.child(currentUserId).child("connections").child("matches").child(dataSnapshot.getKey()).setValue(true);
+                    usersDB.child(currentUserId).child("connections").child("matches").child(dataSnapshot.getKey()).child("ChatId").setValue(key);
+
+                    //usersDB.child(dataSnapshot.getKey()).child("connections").child("matches").child(currentUserId).setValue(true);
+                    usersDB.child(dataSnapshot.getKey()).child("connections").child("matches").child(currentUserId).child("ChatId").setValue(key);
                 }
             }
 
@@ -175,11 +185,17 @@ public class MainActivity extends AppCompatActivity {
         usersDB.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                 if(dataSnapshot.exists() && !dataSnapshot.child("connections").child("nope").hasChild(currentUserId) && !dataSnapshot.child("connections").child("yeps").hasChild(currentUserId) && dataSnapshot.child("gender").getValue().toString().equals(oppositeUserSex)){
                     Cards item = new Cards(dataSnapshot.getKey(), dataSnapshot.child("first_name").getValue().toString(), dataSnapshot.child("id_facebook").getValue().toString(), dataSnapshot.child("age").getValue().toString(), dataSnapshot.child("profile_image").getValue().toString(), dataSnapshot.child("description").getValue().toString()
                     , dataSnapshot.child("latitude").getValue().toString(), dataSnapshot.child("longitude").getValue().toString());
                     rowItems.add(item);
                     cardsAdapter.notifyDataSetChanged();
+                }
+                else{
+                    if (pd.isShowing()){
+                        pd.dismiss();
+                    }
                 }
             }
 
