@@ -9,29 +9,7 @@
     android:orientation="vertical"
     tools:context=".MatchActivity">
 
-
-
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/recyclerView"
-            android:scrollbars="vertical">
-        </android.support.v7.widget.RecyclerView>
-
-    </android.support.v4.widget.NestedScrollView>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="250"
-        android:id="@+id/fragmentContainer"
-        />
-
-    <android.support.design.widget.BottomNavigationView
+    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/bottomMenu"
@@ -40,6 +18,28 @@
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
         />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recyclerView"
+            android:scrollbars="vertical">
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="250"
+        android:id="@+id/fragmentContainer"
+        />
+
+
 
 
 

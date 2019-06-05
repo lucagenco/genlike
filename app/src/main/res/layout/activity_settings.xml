@@ -8,6 +8,16 @@
     android:background="@color/backWhite"
     tools:context=".SettingsActivity">
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottomMenu"
+        android:layout_weight="1"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/navigation"
+        />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:layout_marginTop="40dp"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -27,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         android:onClick="goToChangeSettings"
         android:id="@+id/modifyProfile"
         android:layout_gravity="center"
@@ -40,6 +50,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:onClick="logOut"
+        android:id="@+id/disconnect"
+        android:layout_gravity="center"
+        android:layout_marginTop="35dp"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:text="  Déconnexion"
+        android:drawableLeft="@drawable/ic_directions_run_white_24dp"
+        android:padding="12dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:onClick="deleteAccount"
+        android:id="@+id/delete"
+        android:layout_gravity="center"
+        android:layout_marginTop="35dp"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:text="  Supprimé mon compte"
+        android:drawableLeft="@drawable/ic_delete_forever_white_24dp"
+        android:padding="12dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,13 +83,5 @@
         android:id="@+id/fragmentContainer"
         />
 
-    <android.support.design.widget.BottomNavigationView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/bottomMenu"
-        android:layout_weight="1"
-        android:layout_gravity="bottom"
-        android:layout_alignParentBottom="true"
-        app:menu="@menu/navigation"
-        />
+
 </LinearLayout>

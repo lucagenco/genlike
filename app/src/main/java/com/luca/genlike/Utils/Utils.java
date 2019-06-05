@@ -24,11 +24,11 @@ public class Utils {
         Toast.makeText(contexte,message, Toast.LENGTH_LONG).show();
     }
 
-    public static int getAge(String year, String month, String day)
+    public static int getAge(int year, int month, int day)
     {
         //set up date of birth
         Calendar calDOB = Calendar.getInstance();
-        calDOB.set( Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day) );
+        calDOB.set( year, month, day );
         //setup calNow as today.
         Calendar calNow = Calendar.getInstance();
         calNow.setTime(new java.util.Date());
@@ -70,6 +70,12 @@ public class Utils {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+    }
+
+    public static String displayAge(String birthday){
+        String[] b = birthday.split("/");
+        int age = Utils.getAge(Integer.parseInt(b[0]), Integer.parseInt(b[1]), Integer.parseInt(b[2]));
+        return String.valueOf(age);
     }
 
 }

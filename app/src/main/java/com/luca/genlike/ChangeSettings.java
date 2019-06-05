@@ -9,18 +9,17 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,7 +45,6 @@ import org.angmarch.views.NiceSpinner;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -162,27 +160,23 @@ public class ChangeSettings extends AppCompatActivity {
         if(spinnerAttirance.getSelectedIndex() == 0){
             //Interessé par les hommes donc est une femme
             if(!userSex.equals("Female")){
-                DatabaseReference pathFrom = FirebaseDatabase.getInstance().getReference().child("Users").child(userSex).child(userID);
-                DatabaseReference pathTo = FirebaseDatabase.getInstance().getReference().child("Users").child("Female").child(userID);
-                Utils.moveChild(pathFrom, pathTo);
-                pathFrom.removeValue();
+                DatabaseReference pathFrom = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("gender");
+                pathFrom.setValue("Female");
                 sessionManager.setSex("Female");
-                mAuth.signOut();
-                sessionManager.setIsLogged(false);
-                Utils.changeActivity(ChangeSettings.this, LoginActivity.class);
+                /*mAuth.signOut();
+                sessionManager.setIsLogged(false);*/
+                Utils.changeActivity(ChangeSettings.this, MainActivity.class);
             }
         }
         else if(spinnerAttirance.getSelectedIndex() == 1){
             //Interessé par les femmes donc est un homme
             if(!userSex.equals("Male")){
-                DatabaseReference pathFrom = FirebaseDatabase.getInstance().getReference().child("Users").child(userSex).child(userID);
-                DatabaseReference pathTo = FirebaseDatabase.getInstance().getReference().child("Users").child("Male").child(userID);
-                Utils.moveChild(pathFrom, pathTo);
-                pathFrom.removeValue();
+                DatabaseReference pathFrom = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("gender");
+                pathFrom.setValue("Male");
                 sessionManager.setSex("Male");
-                mAuth.signOut();
-                sessionManager.setIsLogged(false);
-                Utils.changeActivity(ChangeSettings.this, LoginActivity.class);
+                /*mAuth.signOut();
+                sessionManager.setIsLogged(false);*/
+                Utils.changeActivity(ChangeSettings.this, MainActivity.class);
             }
         }
 

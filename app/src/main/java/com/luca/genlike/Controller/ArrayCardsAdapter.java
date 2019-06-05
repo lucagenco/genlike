@@ -50,7 +50,7 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
             txtPosition.setText(resRound + " km     ");
         }
 
-        txtFirst_name.setText(card_item.getFirst_name() + ", " + card_item.getAge());
+        txtFirst_name.setText(card_item.getFirst_name() + ", " + Utils.displayAge(card_item.getBirthday()));
         if(card_item.getDescription().equals("")){
             txtDescription.setText("Aucune description...");
         }else{
@@ -58,7 +58,7 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
         }
         try {
             if(card_item.getProfile_image().equals("facebook_image")){
-                Picasso.with(this.context).load(buildUrlProfile(card_item.getId_facebook()).toString()).into(imgProfile);
+                Picasso.with(this.context).load(Utils.buildUrlProfile(card_item.getId_facebook()).toString()).into(imgProfile);
             }
             else{
                 Picasso.with(this.context).load(card_item.getProfile_image()).into(imgProfile);
@@ -68,10 +68,5 @@ public class ArrayCardsAdapter extends ArrayAdapter<Cards> {
             e.printStackTrace();
         }
         return convertView;
-    }
-
-    private URL buildUrlProfile(String id_facebook) throws MalformedURLException {
-        URL profile_picture = new URL("https://graph.facebook.com/"+ id_facebook+"/picture?width=300&height=300");
-        return profile_picture;
     }
 }

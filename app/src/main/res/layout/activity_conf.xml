@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backWhite"
+    android:orientation="vertical"
+    tools:context=".ConfActivity">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:text="Nouveau profil"
+                android:textSize="30dp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                android:layout_marginBottom="5dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_marginTop="10dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/config_profile_image"
+                android:layout_gravity="center"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:civ_border_width="3dp"
+                android:layout_marginBottom="20dp"
+                app:civ_border_color="@color/colorPrimaryDark"/>
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_last_name"
+                    android:text="Nom"
+                    android:textSize="25dp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_first_name"
+                    android:text="Prénom"
+                    android:textSize="25dp"
+                    android:layout_marginLeft="15dp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <TextView
+                android:text="Date de naissance (jj/mm/aaaa)"
+                android:textSize="22dp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="15dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:background="@color/white"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.shawnlin.numberpicker.NumberPicker
+                    android:id="@+id/day_birthday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    app:np_width="64dp"
+                    app:np_height="180dp"
+                    app:np_dividerColor="@color/colorPrimaryDark"
+                    app:np_max="31"
+                    app:np_min="1"
+                    app:np_selectedTextColor="@color/colorPrimaryDark"
+                    app:np_selectedTextSize="25dp"
+                    app:np_textColor="@color/colorPrimary"
+                    app:np_textSize="25dp"
+                    android:background="@color/white"
+                    app:np_value="1" />
+
+                <com.shawnlin.numberpicker.NumberPicker
+                    android:id="@+id/month_birthday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    app:np_width="64dp"
+                    app:np_height="180dp"
+                    app:np_dividerColor="@color/colorPrimaryDark"
+                    app:np_max="12"
+                    app:np_min="1"
+                    app:np_selectedTextColor="@color/colorPrimaryDark"
+                    app:np_selectedTextSize="25dp"
+                    app:np_textColor="@color/colorPrimary"
+                    app:np_textSize="25dp"
+                    android:background="@color/white"
+                    android:layout_marginLeft="30dp"
+                    app:np_value="1" />
+
+                <com.shawnlin.numberpicker.NumberPicker
+                    android:id="@+id/year_birthday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    app:np_width="64dp"
+                    app:np_height="180dp"
+                    app:np_dividerColor="@color/colorPrimaryDark"
+                    app:np_max="2019"
+                    app:np_min="1950"
+                    app:np_selectedTextColor="@color/colorPrimaryDark"
+                    app:np_selectedTextSize="25dp"
+                    app:np_textColor="@color/colorPrimary"
+                    app:np_textSize="20dp"
+                    android:background="@color/white"
+                    app:np_formatter="%02d"
+                    android:layout_marginLeft="30dp"
+                    app:np_value="1997" />
+            </LinearLayout>
+            <TextView
+                android:text="Choix de votre sexe"
+                android:textSize="22dp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginBottom="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:gravity="center"
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioGroup
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <RadioButton
+                        android:id="@+id/radio_homme"
+                        android:text="Homme"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <RadioButton
+                        android:id="@+id/radio_femme"
+                        android:layout_marginLeft="25dp"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:text="Femme"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </RadioGroup>
+            </LinearLayout>
+            <TextView
+                android:text="Description (facultative)"
+                android:textSize="22dp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginBottom="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:id="@+id/conf_description"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:scrollbars="vertical"
+                android:background="@color/white"
+                android:hint="Ma description..."
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_marginTop="25dp"
+                android:onClick="saveNewProfile"
+                android:layout_gravity="center"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_marginLeft="10dp"
+                android:text="  valider"
+                android:drawableLeft="@drawable/ic_check_white_24dp"
+                android:padding="12dp"
+                android:background="@color/colorPrimaryDark"
+                android:layout_marginBottom="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

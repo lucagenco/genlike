@@ -6,24 +6,19 @@ import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -34,7 +29,6 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
@@ -45,21 +39,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.luca.genlike.Controller.SessionManager;
-import com.luca.genlike.Http.MyRequest;
-import com.luca.genlike.Model.VolleySingleton;
-import com.luca.genlike.Utils.GenderDialog;
 import com.luca.genlike.Utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1; //Used for permissions
@@ -73,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     private static LoginActivity mLoginActivity;
     private static String mLatitude;
     private static String mLongitude;
-    private SessionManager sessionManager;
+    private static SessionManager sessionManager;
     private static String mUserSex;
 
     @Override
@@ -91,16 +74,19 @@ public class LoginActivity extends AppCompatActivity {
         initLocation();
 
         LoginButton loginButton = findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email", "public_profile", "user_birthday");
+        loginButton.setReadPermissions("email", "public_profile");
+
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
+
                 mAccessToken = loginResult.getAccessToken();
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
                         try {
                             mUser = object;
+
                             handleFacebookAccessToken(mAccessToken);
 
                         } catch (Exception e) {
@@ -111,19 +97,19 @@ public class LoginActivity extends AppCompatActivity {
                 });
 
                 Bundle parameters = new Bundle();
-                parameters.putString("fields", "id, email, birthday, friends, first_name, last_name, gender, name");
+                parameters.putString("fields", "id, email, first_name, last_name");
                 request.setParameters(parameters);
                 request.executeAsync();
             }
 
             @Override
             public void onCancel() {
-                // ...
+                Utils.debug(LoginActivity.this, "cancel");
             }
 
             @Override
             public void onError(FacebookException error) {
-                // ...
+                Utils.debug(LoginActivity.this, error.getMessage());
             }
         });
 
@@ -146,76 +132,32 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             final FirebaseUser user = mAuth.getCurrentUser();
                             if(sessionManager.getSex().equals("")){
-                                AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
-                                builder1.setMessage("Précisez votre attirence. D'autres options seront disponible sur la page profil.");
-                                builder1.setCancelable(false);
-                                builder1.setPositiveButton(
-                                        "Je suis attiré par les femmes",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                try {
-                                                    sessionManager.setSex("Male");
-                                                    Utils.debug(LoginActivity.this, "lol");
-                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("profile_image");
-                                                    db_profile_image.setValue("facebook_image");
-                                                    mUserSex = "Male";
-                                                    sessionManager.setIsLogged(true);
-                                                    sessionManager.setPosition(mLatitude, mLongitude);
-                                                    trtConnexion();
-                                                    dialog.cancel();
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                            }
-                                        });
-
-                                builder1.setNegativeButton(
-                                        "Je suis attiré par les hommes",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                try {
-                                                    sessionManager.setSex("Female");
-                                                    DatabaseReference db_profile_image = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("profile_image");
-                                                    db_profile_image.setValue("facebook_image");
-                                                    mUserSex = "Female";
-                                                    sessionManager.setIsLogged(true);
-                                                    sessionManager.setPosition(mLatitude, mLongitude);
-                                                    trtConnexion();
-                                                    dialog.cancel();
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        });
-                                AlertDialog alert11 = builder1.create();
-                                alert11.show();
+                                //FIRST CONNEXION
+                                try {
+                                    sessionManager.setIdFacebook(mUser.getString("id"));
+                                    sessionManager.setProfileImage("facebook_image");
+                                    sessionManager.setFirstName(mUser.getString("first_name"));
+                                    sessionManager.setLastName(mUser.getString("last_name"));
+                                    sessionManager.setPosition(mLatitude, mLongitude);
+                                    Utils.changeActivity(LoginActivity.this, ConfActivity.class);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }else{
                                 try{
-                                    if(sessionManager.getSex().equals("Male")){
-                                        mUserSex = "Male";
-                                        sessionManager.setIsLogged(true);
-                                        sessionManager.setPosition(mLatitude, mLongitude);
-                                        trtConnexion();
-                                    }else if(sessionManager.getSex().equals("Female")){
-                                        mUserSex = "Female";
-                                        sessionManager.setIsLogged(true);
-                                        sessionManager.setPosition(mLatitude, mLongitude);
-                                        trtConnexion();
-                                    }
+                                    mUserSex = sessionManager.getSex();
+                                    sessionManager.setIsLogged(true);
+                                    sessionManager.setPosition(mLatitude, mLongitude);
+                                    trtConnexion();
                                 }
                                 catch(Exception e){
-
                                 }
-
                             }
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
-
-                        // ...
                     }
                 });
     }
@@ -317,79 +259,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private class JsonTask extends AsyncTask<String, String, String> {
-
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            pd = new ProgressDialog(LoginActivity.this);
-            pd.setMessage("Récupération d'informations...");
-            pd.setCancelable(false);
-            pd.show();
-        }
-
-        protected String doInBackground(String... params) {
-
-
-            HttpURLConnection connection = null;
-            BufferedReader reader = null;
-
-            try {
-                URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
-
-
-                InputStream stream = connection.getInputStream();
-
-                reader = new BufferedReader(new InputStreamReader(stream));
-
-                StringBuffer buffer = new StringBuffer();
-                String line = "";
-
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line+"\n");
-                    Log.d("Response: ", "> " + line);
-
-                }
-
-                return buffer.toString();
-
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-                try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-        }
-    }
-
     @SuppressLint("MissingPermission")
     public void initLocation(){
         pd = new ProgressDialog(LoginActivity.this);
         pd.setMessage("Récupération de la position...");
-        pd.setCancelable(false);
+        pd.setCancelable(true);
         pd.show();
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, new LocationListener() {
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1000, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if (pd.isShowing()){
@@ -419,6 +296,9 @@ public class LoginActivity extends AppCompatActivity {
     public static void trtConnexion() throws JSONException {
         FirebaseAuth authL = FirebaseAuth.getInstance();
         String userID = authL.getCurrentUser().getUid();
+
+        /*FACEBOOK INFO*/
+
         //FIRST_NAME
         DatabaseReference db_first_name = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("first_name");
         db_first_name.setValue(mUser.getString("first_name"));
@@ -428,11 +308,13 @@ public class LoginActivity extends AppCompatActivity {
         //ID_FACEBOOK
         DatabaseReference db_id_facebook = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("id_facebook");
         db_id_facebook.setValue(mUser.getString("id"));
+
+        /*--------------*/
+        /*GENLIKE INFO*/
+
         //YEAR OLD
-        String[] birthday = mUser.getString("birthday").split("/");
-        int age = Utils.getAge(birthday[2], birthday[1], birthday[0]);
-        DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("age");
-        db_age.setValue(age);
+        DatabaseReference db_age = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("birthday");
+        db_age.setValue(sessionManager.getBirthday());
         //POSITION
         DatabaseReference db_latitude = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("latitude");
         db_latitude.setValue(mLatitude);
@@ -444,7 +326,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //DESCRIPTION
         DatabaseReference db_description = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("description");
-        db_description.setValue("");
+        db_description.setValue(sessionManager.getDescription());
         Utils.changeActivity(mLoginActivity, MainActivity.class);
 
     }

@@ -1,18 +1,21 @@
 package com.luca.genlike.Chat;
 
-import android.os.Debug;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -36,6 +39,8 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mSendEditText;
     private Button mSendButton;
     private String currentUID, matchId, chatId;
+    private ScrollView scrollView;
+    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(ChatActivity.this);
     DatabaseReference mDatabaseUser, mDatabaseChat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         mDatabaseChat =  FirebaseDatabase.getInstance().getReference().child("Chat");
         getChatId();
         mRecyclerView = findViewById(R.id.recyclerView);
-        mRecyclerView.setNestedScrollingEnabled(false);
+        mRecyclerView.setNestedScrollingEnabled(true);
         mRecyclerView.setHasFixedSize(false);
         mChatLayoutManager = new LinearLayoutManager(ChatActivity.this);
         mRecyclerView.setLayoutManager(mChatLayoutManager);
@@ -55,6 +60,7 @@ public class ChatActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mChatAdapter);
         mSendEditText = findViewById(R.id.myMessage);
         mSendButton = findViewById(R.id.send);
+        scrollView = findViewById(R.id.myScroll);
 
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +68,7 @@ public class ChatActivity extends AppCompatActivity {
                 sendMessage();
             }
         });
+
     }
 
     private void sendMessage() {
@@ -107,7 +114,6 @@ public class ChatActivity extends AppCompatActivity {
                     }
                     if(dataSnapshot.child("createdByUser").getValue() != null){
                         createdByUser = dataSnapshot.child("createdByUser").getValue().toString();
-                        Utils.debug(ChatActivity.this, createdByUser);
                     }
                     if(message != null && createdByUser != null){
 
@@ -118,7 +124,7 @@ public class ChatActivity extends AppCompatActivity {
                         ChatObject newMessage = new ChatObject(message, currentUserBoolean);
                         resultsChat.add(newMessage);
                         mChatAdapter.notifyDataSetChanged();
-
+                        scrollView.fullScroll(ScrollView.FOCUS_DOWN);
                     }
                 }
             }

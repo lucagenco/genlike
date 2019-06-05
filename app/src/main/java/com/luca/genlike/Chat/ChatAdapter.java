@@ -2,8 +2,8 @@ package com.luca.genlike.Chat;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 import com.luca.genlike.R;
 import com.luca.genlike.Utils.Utils;
-import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,7 +37,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatViewHolders> {
 
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolders holder, int position) {
-        Utils.debug(this.context, holder.mMessage.getText().toString());
         holder.mMessage.setText(ChatList.get(position).getMessage());
         if(ChatList.get(position).getCurrentUser()){
             holder.mMessage.setGravity(Gravity.END);

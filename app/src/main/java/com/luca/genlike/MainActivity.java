@@ -1,16 +1,14 @@
 package com.luca.genlike;
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,7 +22,6 @@ import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.luca.genlike.Controller.ArrayCardsAdapter;
 import com.luca.genlike.Controller.Cards;
 import com.luca.genlike.Controller.SessionManager;
-import com.luca.genlike.Controller.SwipeFling;
 import com.luca.genlike.Utils.Utils;
 
 import java.util.ArrayList;
@@ -187,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
                 if(dataSnapshot.exists() && !dataSnapshot.child("connections").child("nope").hasChild(currentUserId) && !dataSnapshot.child("connections").child("yeps").hasChild(currentUserId) && dataSnapshot.child("gender").getValue().toString().equals(oppositeUserSex)){
-                    Cards item = new Cards(dataSnapshot.getKey(), dataSnapshot.child("first_name").getValue().toString(), dataSnapshot.child("id_facebook").getValue().toString(), dataSnapshot.child("age").getValue().toString(), dataSnapshot.child("profile_image").getValue().toString(), dataSnapshot.child("description").getValue().toString()
+                    Cards item = new Cards(dataSnapshot.getKey(), dataSnapshot.child("first_name").getValue().toString(), dataSnapshot.child("id_facebook").getValue().toString(), dataSnapshot.child("birthday").getValue().toString(), dataSnapshot.child("profile_image").getValue().toString(), dataSnapshot.child("description").getValue().toString()
                     , dataSnapshot.child("latitude").getValue().toString(), dataSnapshot.child("longitude").getValue().toString());
                     rowItems.add(item);
                     cardsAdapter.notifyDataSetChanged();
@@ -223,12 +220,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void goToSettings(View v){
         Utils.changeActivity(MainActivity.this, SettingsActivity.class);
-    }
-
-    public void logOut(){
-        mAuth.signOut();
-        sessionManager.setIsLogged(false);
-        Utils.changeActivity(MainActivity.this, LoginActivity.class);
     }
 
 }

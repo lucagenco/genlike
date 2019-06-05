@@ -4,17 +4,17 @@ public class Cards {
     private String userID;
     private String first_name;
     private String id_facebook;
-    private String age;
+    private String birthday;
     private String profile_image;
     private String description;
     private String latitude;
     private String longitude;
 
-    public Cards(String userID, String first_name, String id_facebook, String age, String profile_image, String description, String latitude, String longitude) {
+    public Cards(String userID, String first_name, String id_facebook, String birthday, String profile_image, String description, String latitude, String longitude) {
         this.userID = userID;
         this.first_name = first_name;
         this.id_facebook = id_facebook;
-        this.age = age;
+        this.birthday = birthday;
         this.profile_image = profile_image;
         this.description = description;
         this.latitude = latitude;
@@ -45,12 +45,12 @@ public class Cards {
         this.id_facebook = id_facebook;
     }
 
-    public String getAge() {
-        return age;
+    public String getBirthday() {
+        return birthday;
     }
 
-    public void setAge(String age) {
-        this.age = age;
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 
     public String getProfile_image() {
