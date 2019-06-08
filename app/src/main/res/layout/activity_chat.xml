@@ -46,4 +46,5 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
     <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+
 </RelativeLayout>

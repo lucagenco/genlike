@@ -4,10 +4,13 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 
 import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -125,10 +128,68 @@ public class SettingsActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        dbUsers.removeValue();
                         mAuth.signOut();
                         sessionManager.deleteAll();
-                        Utils.changeActivity(SettingsActivity.this, LoginActivity.class);
+                        //Suppression
+                        FirebaseDatabase.getInstance().getReference().child("Tokens").child(userID).removeValue();
+                        FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("connections").child("matches").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot child: dataSnapshot.getChildren()){
+                                    FirebaseDatabase.getInstance().getReference().child("Chat").child(child.child("ChatId").getValue().toString()).removeValue();
+                                }
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //Supprimé les yeps et nope
+                                        FirebaseDatabase.getInstance().getReference().child("Users").addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if(dataSnapshot.exists()){
+                                                    for (DataSnapshot child: dataSnapshot.getChildren()){
+                                                        FirebaseDatabase.getInstance().getReference().child("Users").child(child.getKey()).child("connections").child("yeps").child(userID).removeValue();
+                                                    }
+                                                    for (DataSnapshot child: dataSnapshot.getChildren()){
+                                                        FirebaseDatabase.getInstance().getReference().child("Users").child(child.getKey()).child("connections").child("nope").child(userID).removeValue();
+                                                    }
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                        //Supprimé les matchs
+                                        FirebaseDatabase.getInstance().getReference().child("Users").addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if(dataSnapshot.exists()){
+                                                    for (DataSnapshot child: dataSnapshot.getChildren()){
+                                                        FirebaseDatabase.getInstance().getReference().child("Users").child(child.getKey()).child("connections").child("matches").child(userID).removeValue();
+                                                    }
+                                                    //Supprimé profil de la db
+                                                    dbUsers.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Utils.changeActivity(SettingsActivity.this, LoginActivity.class);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    }
+                                }, 400);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 });
 
@@ -136,7 +197,7 @@ public class SettingsActivity extends AppCompatActivity {
                 "Annuler",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
+                        dialog.dismiss();
                     }
                 });
         AlertDialog alert11 = builder1.create();
