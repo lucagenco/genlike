@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.luca.genlike"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -38,6 +38,11 @@ dependencies {
     implementation 'com.shawnlin:number-picker:2.4.8'
     implementation 'com.lorentzos.swipecards:library:1.0.9'
     implementation 'androidx.vectordrawable:vectordrawable:1.0.0-beta01'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.+'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'

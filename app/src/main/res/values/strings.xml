@@ -6,4 +6,6 @@
     <string name="title_profile">Profil</string>
     <string name="title_like">Like</string>
     <string name="title_matchs">Matchs</string>
+    <string name="radar">Radar</string>
+    <string name="my_likes">Mes likes</string>
 </resources>

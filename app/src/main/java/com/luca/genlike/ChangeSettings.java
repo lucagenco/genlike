@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
@@ -34,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.luca.genlike.Chat.ChatActivity;
 import com.luca.genlike.Controller.SessionManager;
 import com.luca.genlike.Utils.Utils;
 import com.squareup.picasso.Callback;
@@ -77,6 +79,18 @@ public class ChangeSettings extends AppCompatActivity {
         pd.setMessage("Chargement des données...");
         pd.setCancelable(false);
         pd.show();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Réglages");
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Utils.changeActivity(ChangeSettings.this, SettingsActivity.class);
+            }
+        });
 
         datasetAttirance = new LinkedList<>(Arrays.asList("Je suis interessé(e) par les hommes", "Je suis interessé(e) par les femmes"));
         spinnerAttirance.attachDataSource(datasetAttirance);

@@ -12,56 +12,92 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/bottomMenu"
-        android:layout_weight="1"
         android:layout_gravity="top"
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
         />
-    <com.lorentzos.flingswipe.SwipeFlingAdapterView
-        android:id="@+id/frame"
-        android:background="@color/backWhite"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="450dp"
-        app:rotation_degrees="15.5"
-        tools:context=".MyActivity" />
-
-    <LinearLayout
-        android:layout_marginTop="30dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
         android:layout_height="wrap_content">
-        <androidx.appcompat.widget.AppCompatButton
-            android:onClick="selectLeft"
-            android:layout_gravity="center"
-            android:textSize="12dp"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:text="  Nope"
-            android:drawableLeft="@drawable/ic_thumb_down_white_24dp"
-            android:padding="5dp"
-            android:background="@color/colorPrimaryDark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:onClick="selectRight"
-            android:layout_marginLeft="30dp"
-            android:layout_gravity="center"
-            android:textSize="12dp"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:text="  Like"
-            android:drawableLeft="@drawable/ic_thumb_up_white_24dp"
-            android:padding="5dp"
-            android:background="@color/colorPrimaryDark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <FrameLayout
+    <LinearLayout
+        android:layout_gravity="center"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="9"
-        android:id="@+id/fragmentContainer"
-        />
+        android:layout_height="match_parent">
+        <com.lorentzos.flingswipe.SwipeFlingAdapterView
+            android:id="@+id/frame"
+            android:background="@color/backWhite"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            app:rotation_degrees="15.5"
+            tools:context=".MyActivity" />
+
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/search"
+                android:layout_marginTop="180dp"
+                android:visibility="visible"
+                android:layout_marginBottom="170dp"
+                android:src="@drawable/search"
+                android:layout_width="100dp"
+                android:layout_height="100dp" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/emptyTV"
+            android:layout_marginTop="200dp"
+            android:layout_marginBottom="200dp"
+            android:textSize="20dp"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:text="Plus de personnes à liker..."
+            android:visibility="gone"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_marginTop="30dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:onClick="selectLeft"
+                android:layout_gravity="center"
+                android:textSize="12dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:text="  Nope"
+                android:drawableLeft="@drawable/ic_thumb_down_white_24dp"
+                android:padding="5dp"
+                android:background="@color/colorPrimaryDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:onClick="selectRight"
+                android:layout_marginLeft="30dp"
+                android:layout_gravity="center"
+                android:textSize="12dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:text="  Like"
+                android:drawableLeft="@drawable/ic_thumb_up_white_24dp"
+                android:padding="5dp"
+                android:background="@color/colorPrimaryDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

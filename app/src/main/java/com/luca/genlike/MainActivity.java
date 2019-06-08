@@ -6,9 +6,12 @@ import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private Cards cards_data[];
+
     private ArrayCardsAdapter cardsAdapter;
     SwipeFlingAdapterView flingContainer;
     private FirebaseAuth mAuth;
@@ -39,10 +42,11 @@ public class MainActivity extends AppCompatActivity {
     List<Cards> rowItems;
     private DatabaseReference usersDB;
     private SessionManager sessionManager;
+    private ImageView search;
     //WIDGET
-    private Button btnSignOut;
+
     private BottomNavigationView bottomNavigationView;
-    ProgressDialog pd;
+
 
 
     @Override
@@ -54,10 +58,8 @@ public class MainActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         usersDB = FirebaseDatabase.getInstance().getReference().child("Users");
         currentUserId = mUser.getUid();
-        pd = new ProgressDialog(MainActivity.this);
-        pd.setMessage("Chargement des données...");
-        pd.setCancelable(false);
-        pd.show();
+        search = findViewById(R.id.search);
+
 
         checkUserSex();
         rowItems = new ArrayList<>();
@@ -78,6 +80,16 @@ public class MainActivity extends AppCompatActivity {
                 Cards obj = (Cards) o;
                 String userId = obj.getUserID();
                 usersDB.child(userId).child("connections").child("nope").child(currentUserId).setValue(true);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(rowItems.size() == 0){
+                            flingContainer.setVisibility(View.GONE);
+                            TextView textView = findViewById(R.id.emptyTV);
+                            textView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }, 200);
             }
 
             @Override
@@ -86,6 +98,16 @@ public class MainActivity extends AppCompatActivity {
                 String userId = obj.getUserID();
                 usersDB.child(userId).child("connections").child("yeps").child(currentUserId).setValue(true);
                 isConnectionMatch(userId);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(rowItems.size() == 0){
+                            flingContainer.setVisibility(View.GONE);
+                            TextView textView = findViewById(R.id.emptyTV);
+                            textView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }, 200);
             }
 
             @Override
@@ -118,6 +140,18 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "clicked", Toast.LENGTH_SHORT).show();
             }
         });
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(rowItems.size() == 0){
+                    flingContainer.setVisibility(View.GONE);
+                    TextView textView = findViewById(R.id.emptyTV);
+                    textView.setVisibility(View.VISIBLE);
+                    search.setVisibility(View.GONE);
+                }
+            }
+        }, 9000);
     }
 
     public void selectRight(View v){
@@ -190,9 +224,8 @@ public class MainActivity extends AppCompatActivity {
                     cardsAdapter.notifyDataSetChanged();
                 }
                 else{
-                    if (pd.isShowing()){
-                        pd.dismiss();
-                    }
+                    search.setVisibility(View.GONE);
+                    flingContainer.setVisibility(View.VISIBLE);
                 }
             }
 

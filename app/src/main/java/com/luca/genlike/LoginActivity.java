@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +18,8 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -58,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     private static String mLongitude;
     private static SessionManager sessionManager;
     private static String mUserSex;
+    private boolean checkLocService = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +74,8 @@ public class LoginActivity extends AppCompatActivity {
         mLoginActivity = this;
         LoginManager.getInstance().logOut();
         checkPermissions();
+        statusCheck();
         //GPS
-        initLocation();
 
         LoginButton loginButton = findViewById(R.id.login_button);
         loginButton.setReadPermissions("email", "public_profile");
@@ -139,7 +143,12 @@ public class LoginActivity extends AppCompatActivity {
                                     sessionManager.setFirstName(mUser.getString("first_name"));
                                     sessionManager.setLastName(mUser.getString("last_name"));
                                     sessionManager.setPosition(mLatitude, mLongitude);
-                                    Utils.changeActivity(LoginActivity.this, ConfActivity.class);
+                                    statusCheck();
+                                    if(checkLocService){
+                                        Utils.changeActivity(LoginActivity.this, ConfActivity.class);
+                                    }else{
+                                        statusCheck();
+                                    }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -229,6 +238,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_LOC);
+
                         }
                     })
                     .setNegativeButton("Annuler",  new DialogInterface.OnClickListener(){
@@ -263,10 +273,10 @@ public class LoginActivity extends AppCompatActivity {
     public void initLocation(){
         pd = new ProgressDialog(LoginActivity.this);
         pd.setMessage("Récupération de la position...");
-        pd.setCancelable(true);
+        pd.setCancelable(false);
         pd.show();
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1000, new LocationListener() {
+        final LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if (pd.isShowing()){
@@ -274,6 +284,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 mLatitude = String.valueOf(location.getLatitude());
                 mLongitude = String.valueOf(location.getLongitude());
+                checkLocService = true;
             }
 
             @Override
@@ -290,7 +301,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onProviderDisabled(String s) {
 
             }
-        });
+        };
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1000, locationListener);
     }
 
     public static void trtConnexion() throws JSONException {
@@ -328,7 +340,36 @@ public class LoginActivity extends AppCompatActivity {
         DatabaseReference db_description = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("description");
         db_description.setValue(sessionManager.getDescription());
         Utils.changeActivity(mLoginActivity, MainActivity.class);
-
     }
+
+    public void statusCheck() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            checkLocService = false;
+            buildAlertMessageNoGps();
+        }else{
+            initLocation();
+        }
+    }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Votre localisation est désactivé. Celle-ci est obligatoire pour que l'application fonctionne. L'application nécessite un redémarrage une fois la localisation activé.")
+                .setCancelable(false)
+                .setPositiveButton("Activer", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("Désactiver", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
 
 }

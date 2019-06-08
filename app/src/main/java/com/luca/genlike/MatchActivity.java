@@ -6,7 +6,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -59,7 +63,16 @@ public class MatchActivity extends AppCompatActivity {
                 return true;
             }
         });
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+               if(resultsMatches.size() == 0){
+                   mRecyclerView.setVisibility(View.GONE);
+                   TextView textView = findViewById(R.id.emptyTV);
+                   textView.setVisibility(View.VISIBLE);
+               }
+            }
+        }, 200);
     }
 
     private void getUserMatchId() {

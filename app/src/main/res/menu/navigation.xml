@@ -16,4 +16,14 @@
         android:icon="@drawable/ic_message_black_24dp"
         android:title="@string/title_matchs" />
 
+    <item
+        android:id="@+id/navigation_radar"
+        android:icon="@drawable/ic_location_searching_black_24dp"
+        android:title="@string/radar" />
+
+    <item
+        android:id="@+id/navigation_my_likes"
+        android:icon="@drawable/ic_supervisor_account_black_24dp"
+        android:title="@string/my_likes" />
+
 </menu>
