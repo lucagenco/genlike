@@ -2,6 +2,7 @@ package com.luca.genlike;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -105,6 +106,21 @@ public class ConfActivity extends AppCompatActivity {
         DatabaseReference db_description = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("description");
         db_description.setValue(et_description.getText().toString());
         sessionManager.setDescription(et_description.getText().toString());
-        Utils.changeActivity(ConfActivity.this, MainActivity.class);
+        //SLOTS
+        DatabaseReference db_slot1 = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("slot1");
+        DatabaseReference db_slot2 = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("slot2");
+        DatabaseReference db_slot3 = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("slot3");
+        db_slot1.setValue("https://firebasestorage.googleapis.com/v0/b/however-9394.appspot.com/o/pictures%2Fdefault.png?alt=media&token=c90f2163-a591-4df7-9ad8-7f35c5276393");
+        db_slot2.setValue("https://firebasestorage.googleapis.com/v0/b/however-9394.appspot.com/o/pictures%2Fdefault.png?alt=media&token=c90f2163-a591-4df7-9ad8-7f35c5276393");
+        db_slot3.setValue("https://firebasestorage.googleapis.com/v0/b/however-9394.appspot.com/o/pictures%2Fdefault.png?alt=media&token=c90f2163-a591-4df7-9ad8-7f35c5276393");
+        sessionManager.setSlot1("https://firebasestorage.googleapis.com/v0/b/however-9394.appspot.com/o/pictures%2Fdefault.png?alt=media&token=c90f2163-a591-4df7-9ad8-7f35c5276393");
+        sessionManager.setSlot2("https://firebasestorage.googleapis.com/v0/b/however-9394.appspot.com/o/pictures%2Fdefault.png?alt=media&token=c90f2163-a591-4df7-9ad8-7f35c5276393");
+        sessionManager.setSlot3("https://firebasestorage.googleapis.com/v0/b/however-9394.appspot.com/o/pictures%2Fdefault.png?alt=media&token=c90f2163-a591-4df7-9ad8-7f35c5276393");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Utils.changeActivity(ConfActivity.this, MainActivity.class);
+            }
+        }, 300);
     }
 }

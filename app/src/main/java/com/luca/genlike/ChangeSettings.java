@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -54,6 +56,9 @@ import java.util.Map;
 public class ChangeSettings extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
     public static final int REQUEST_CODE_PICk = 2;
+    public static final int REQUEST_CODE_PICK_SLOT1 = 3;
+    public static final int REQUEST_CODE_PICK_SLOT2 = 4;
+    public static final int REQUEST_CODE_PICK_SLOT3 = 5;
     private ImageView profile_image;
     private DatabaseReference dbUsers;
     private FirebaseAuth mAuth;
@@ -65,7 +70,14 @@ public class ChangeSettings extends AppCompatActivity {
     private EditText etDescription;
     private SessionManager sessionManager;
     private Uri resultUri;
+    private Uri slot1tUri;
+    private Uri slot2tUri;
+    private Uri slot3tUri;
     ProgressDialog pd;
+    ProgressDialog pd2;
+    private ImageView slot1;
+    private ImageView slot2;
+    private ImageView slot3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +86,17 @@ public class ChangeSettings extends AppCompatActivity {
         profile_image = findViewById(R.id.change_profile_image);
         spinnerAttirance = findViewById(R.id.spAttirance);
         etDescription = findViewById(R.id.etDescription);
+        slot1 = findViewById(R.id.slot1);
+        slot2 = findViewById(R.id.slot2);
+        slot3 = findViewById(R.id.slot3);
         resultUri = null;
         pd = new ProgressDialog(ChangeSettings.this);
         pd.setMessage("Chargement des données...");
-        pd.setCancelable(false);
+        pd.setCancelable(true);
         pd.show();
+        pd2 = new ProgressDialog(ChangeSettings.this);
+        pd2.setMessage("Validation des données...");
+        pd2.setCancelable(false);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -155,6 +173,11 @@ public class ChangeSettings extends AppCompatActivity {
                     if(dataSnapshot.hasChild("description")){
                         etDescription.setText(map.get("description").toString());
                     }
+
+                    Picasso.with(ChangeSettings.this).load(map.get("slot1").toString()).into(slot1);
+                    Picasso.with(ChangeSettings.this).load(map.get("slot2").toString()).into(slot2);
+                    Picasso.with(ChangeSettings.this).load(map.get("slot3").toString()).into(slot3);
+
                 }
             }
 
@@ -166,6 +189,7 @@ public class ChangeSettings extends AppCompatActivity {
     }
 
     public void applyChange(View v){
+        pd2.show();
         if(!etDescription.getText().toString().equals("")){
             DatabaseReference dbInsertDesc = FirebaseDatabase.getInstance().getReference().child("Users").child(userID).child("description");
             dbInsertDesc.setValue(etDescription.getText().toString());
@@ -226,8 +250,112 @@ public class ChangeSettings extends AppCompatActivity {
                     });
                 }
             });
+        }else if(slot1tUri != null){
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("pictures").child(userID+"slot1");
+            Bitmap bit = null;
+            try {
+                bit = MediaStore.Images.Media.getBitmap(getApplication().getContentResolver(), slot1tUri);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bit.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+            byte[] data = baos.toByteArray();
+            UploadTask uploadTask = filePath.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    finish();
+                }
+            });
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Task<Uri> downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                    downloadUrl.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            dbUsers.child("slot1").setValue(uri.toString());
+                        }
+                    });
+                }
+            });
+        }else if(slot2tUri != null){
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("pictures").child(userID+"slot2");
+            Bitmap bit = null;
+            try {
+                bit = MediaStore.Images.Media.getBitmap(getApplication().getContentResolver(), slot2tUri);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bit.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+            byte[] data = baos.toByteArray();
+            UploadTask uploadTask = filePath.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    finish();
+                }
+            });
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Task<Uri> downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                    downloadUrl.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            dbUsers.child("slot2").setValue(uri.toString());
+                        }
+                    });
+                }
+            });
+        }else if(slot3tUri != null){
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("pictures").child(userID+"slot3");
+            Bitmap bit = null;
+            try {
+                bit = MediaStore.Images.Media.getBitmap(getApplication().getContentResolver(), slot3tUri);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bit.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+            byte[] data = baos.toByteArray();
+            UploadTask uploadTask = filePath.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    finish();
+                }
+            });
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Task<Uri> downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                    downloadUrl.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            dbUsers.child("slot3").setValue(uri.toString());
+                        }
+                    });
+                }
+            });
         }
-        Utils.changeActivity(ChangeSettings.this, MainActivity.class);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(pd2.isShowing()){
+                    pd2.dismiss();
+                }
+                Utils.changeActivity(ChangeSettings.this, MainActivity.class);
+            }
+        }, 500);
     }
 
     public void pickImageProfile(View v){
@@ -235,6 +363,39 @@ public class ChangeSettings extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             startActivityForResult(intent, REQUEST_CODE_PICk);
+        }
+        else {
+            requestSendStoragePermission();
+        }
+    }
+
+    public void pickSlot1(View v){
+        if(ContextCompat.checkSelfPermission(ChangeSettings.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ){
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_CODE_PICK_SLOT1);
+        }
+        else {
+            requestSendStoragePermission();
+        }
+    }
+
+    public void pickSlot2(View v){
+        if(ContextCompat.checkSelfPermission(ChangeSettings.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ){
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_CODE_PICK_SLOT2);
+        }
+        else {
+            requestSendStoragePermission();
+        }
+    }
+
+    public void pickSlot3(View v){
+        if(ContextCompat.checkSelfPermission(ChangeSettings.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ){
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_CODE_PICK_SLOT3);
         }
         else {
             requestSendStoragePermission();
@@ -292,6 +453,18 @@ public class ChangeSettings extends AppCompatActivity {
             final Uri imageUri = data.getData();
             profile_image.setImageURI(imageUri);
             resultUri = imageUri;
+        }else if(requestCode == REQUEST_CODE_PICK_SLOT1 && resultCode == Activity.RESULT_OK){
+            final Uri imageUri = data.getData();
+            slot1.setImageURI(imageUri);
+            slot1tUri = imageUri;
+        }else if(requestCode == REQUEST_CODE_PICK_SLOT2 && resultCode == Activity.RESULT_OK){
+            final Uri imageUri = data.getData();
+            slot2.setImageURI(imageUri);
+            slot2tUri = imageUri;
+        }else if(requestCode == REQUEST_CODE_PICK_SLOT3 && resultCode == Activity.RESULT_OK){
+            final Uri imageUri = data.getData();
+            slot3.setImageURI(imageUri);
+            slot3tUri = imageUri;
         }
     }
 }

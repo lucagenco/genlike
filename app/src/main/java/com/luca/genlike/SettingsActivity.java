@@ -43,6 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView nameAndAge;
     private BottomNavigationView bottomNavigationView;
     private SessionManager sessionManager;
+    private ImageView loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
         sessionManager = new SessionManager(SettingsActivity.this);
         profileImage = findViewById(R.id.profile_image);
         nameAndAge = findViewById(R.id.nameAndYear);
-
+        loading = findViewById(R.id.search);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         userID = mUser.getUid();
@@ -69,14 +70,36 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                     if(map.get("profile_image").toString().equals("facebook_image")){
                         try {
-                            Picasso.with(SettingsActivity.this).load(Utils.buildUrlProfile(map.get("id_facebook").toString()).toString()).into(profileImage);
+                            Picasso.with(SettingsActivity.this).load(Utils.buildUrlProfile(map.get("id_facebook").toString()).toString()).into(profileImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    loading.setVisibility(View.GONE);
+                                    profileImage.setVisibility(View.VISIBLE);
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                         } catch (Exception e) {
                             Log.d("YOO", e.getMessage());
                         }
                     }
                     else{
                         try {
-                            Picasso.with(SettingsActivity.this).load(map.get("profile_image").toString()).into(profileImage);
+                            Picasso.with(SettingsActivity.this).load(map.get("profile_image").toString()).into(profileImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    loading.setVisibility(View.GONE);
+                                    profileImage.setVisibility(View.VISIBLE);
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                         } catch (Exception e) {
                             Log.d("YOO", e.getMessage());
                         }

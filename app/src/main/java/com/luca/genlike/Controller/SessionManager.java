@@ -21,6 +21,9 @@ public class SessionManager {
     private final static String LONGITUDE = "longitude";
     private final static String FIRST_NAME = "first_name";
     private final static String LAST_NAME = "last_name";
+    private final static String SLOT_1 = "s1";
+    private final static String SLOT_2 = "s2";
+    private final static String SLOT_3 = "s3";
     private Context context;
 
 
@@ -91,6 +94,21 @@ public class SessionManager {
         editor.commit();
     }
 
+    public void setSlot1(String slot1){
+        editor.putString(YEAR_BIRTHDAY, slot1);
+        editor.commit();
+    }
+
+    public void setSlot2(String slot2){
+        editor.putString(YEAR_BIRTHDAY, slot2);
+        editor.commit();
+    }
+
+    public void setSlot3(String slot3){
+        editor.putString(YEAR_BIRTHDAY, slot3);
+        editor.commit();
+    }
+
     public String getBirthday(){
         return this.getYearBirthday() + "/" + this.getMonthBirthday() + "/" + this.getDayBirthday();
     }
@@ -149,6 +167,18 @@ public class SessionManager {
 
     public int getYearBirthday(){
         return prefs.getInt(YEAR_BIRTHDAY, 0);
+    }
+
+    public String getSlot1(){
+        return prefs.getString(SLOT_1, "");
+    }
+
+    public String getSlot2(){
+        return prefs.getString(SLOT_2, "");
+    }
+
+    public String getSlot3(){
+        return prefs.getString(SLOT_3, "");
     }
 
     public void deleteAll(){

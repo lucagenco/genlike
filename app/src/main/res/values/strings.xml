@@ -9,4 +9,14 @@
     <string name="radar">Radar</string>
     <string name="my_likes">Mes likes</string>
     <string name="delete_match">Supprimer match</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="tab_text_1">Informations</string>
+    <string name="tab_text_2">Photos</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

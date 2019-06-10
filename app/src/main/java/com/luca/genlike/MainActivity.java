@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
-                Toast.makeText(MainActivity.this, "clicked", Toast.LENGTH_SHORT).show();
+                Utils.changeActivity(MainActivity.this, DetailActivity.class);
             }
         });
 
