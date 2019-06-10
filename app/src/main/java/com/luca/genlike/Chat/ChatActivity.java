@@ -2,6 +2,7 @@ package com.luca.genlike.Chat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,11 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -32,6 +39,7 @@ import com.luca.genlike.Notification.MyResponse;
 import com.luca.genlike.Notification.Sender;
 import com.luca.genlike.Notification.Token;
 import com.luca.genlike.R;
+import com.luca.genlike.SettingsActivity;
 import com.luca.genlike.Utils.Utils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +54,7 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mSendEditText;
     private Button mSendButton;
     private String currentUID, matchId, chatId;
-    DatabaseReference mDatabaseUser, mDatabaseChat;
+    DatabaseReference mDatabaseUser, mDatabaseChat, mDatabaseMatch, hDatabaseMatch, mDatabaseConnections, hDatabaseConnections, mDatabaseDbChat;
     private ArrayList<ChatObject> resultsChat = new ArrayList<>();
     private String message = null;
     private String createdByUser = null;
@@ -66,7 +74,12 @@ public class ChatActivity extends AppCompatActivity {
         matchId = getIntent().getExtras().getString("matchId");
         currentUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         mDatabaseUser = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUID).child("connections").child("matches").child(matchId).child("ChatId");
+        mDatabaseMatch = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUID).child("connections").child("matches");
+        hDatabaseMatch = FirebaseDatabase.getInstance().getReference().child("Users").child(matchId).child("connections").child("matches");
+        mDatabaseConnections = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUID).child("connections");
+        hDatabaseConnections = FirebaseDatabase.getInstance().getReference().child("Users").child(matchId).child("connections");
         mDatabaseChat =  FirebaseDatabase.getInstance().getReference().child("Chat");
+        mDatabaseDbChat = FirebaseDatabase.getInstance().getReference().child("Chat");
         FirebaseDatabase.getInstance().getReference().child("Users").child(matchId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -125,6 +138,65 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 notify = true;
                 sendMessage();
+            }
+        });
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if(item.getItemId() == R.id.delete_match){
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(ChatActivity.this);
+                    builder1.setMessage("Supprimé définitivement le match ?");
+                    builder1.setCancelable(false);
+                    builder1.setPositiveButton("Confirmer", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mDatabaseUser.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                                    mDatabaseDbChat.child(dataSnapshot.getValue().toString()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            mDatabaseMatch.child(matchId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    hDatabaseMatch.child(currentUID).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            mDatabaseConnections.child("yeps").child(matchId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    hDatabaseConnections.child("yeps").child(currentUID).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Utils.changeActivity(ChatActivity.this, MatchActivity.class);
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    })
+                    .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
+                }
+                return false;
             }
         });
         updateToken(FirebaseInstanceId.getInstance().getToken());
@@ -279,4 +351,9 @@ public class ChatActivity extends AppCompatActivity {
         reference.child(currentUID).setValue(token1);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_manager, menu);
+        return true;
+    }
 }
