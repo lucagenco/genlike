@@ -5,6 +5,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -20,11 +25,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
+import com.luca.genlike.Chat.ChatActivity;
 import com.luca.genlike.Controller.ArrayCardsAdapter;
 import com.luca.genlike.Controller.Cards;
 import com.luca.genlike.Controller.SessionManager;
+import com.luca.genlike.Notification.APIService;
+import com.luca.genlike.Notification.Client;
+import com.luca.genlike.Notification.Data;
+import com.luca.genlike.Notification.MyResponse;
+import com.luca.genlike.Notification.Sender;
+import com.luca.genlike.Notification.Token;
 import com.luca.genlike.Utils.Utils;
 
 import java.util.ArrayList;
@@ -43,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference usersDB;
     private SessionManager sessionManager;
     private ImageView search;
+    private APIService apiService;
     //WIDGET
 
     private BottomNavigationView bottomNavigationView;
@@ -59,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         usersDB = FirebaseDatabase.getInstance().getReference().child("Users");
         currentUserId = mUser.getUid();
         search = findViewById(R.id.search);
-
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         checkUserSex();
         rowItems = new ArrayList<>();
@@ -137,7 +151,22 @@ public class MainActivity extends AppCompatActivity {
         flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
-                Utils.changeActivity(MainActivity.this, DetailActivity.class);
+                Cards cards = (Cards)dataObject;
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("userID", cards.getUserID());
+                bundle.putString("userFirstName", cards.getFirst_name());
+                bundle.putString("userBirthday", cards.getBirthday());
+                bundle.putString("userLatitude", cards.getLatitude());
+                bundle.putString("userLongitude", cards.getLongitude());
+                bundle.putString("userDescription", cards.getDescription());
+                bundle.putString("userProfileImage", cards.getProfile_image());
+                bundle.putString("userIDFacebook", cards.getId_facebook());
+                bundle.putString("myLatitude", sessionManager.getLattitude());
+                bundle.putString("myLongitude", sessionManager.getLongitude());
+                bundle.putString("myUserID", currentUserId);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
 
@@ -151,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     search.setVisibility(View.GONE);
                 }
             }
-        }, 9000);
+        }, 7000);
     }
 
     public void selectRight(View v){
@@ -162,6 +191,11 @@ public class MainActivity extends AppCompatActivity {
         flingContainer.getTopCardListener().selectLeft();
     }
 
+    public void refresh(View v){
+       finish();
+       startActivity(getIntent());
+    }
+
     private void isConnectionMatch(final String userId) {
         DatabaseReference currentUserConnectionDb = usersDB.child(currentUserId).child("connections").child("yeps").child(userId);
         currentUserConnectionDb.addValueEventListener(new ValueEventListener() {
@@ -169,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     Utils.debug(MainActivity.this, "new Connection");
+                    sendNotification(userId);
                     String key = FirebaseDatabase.getInstance().getReference().child("Chat").push().getKey();
 
                     //usersDB.child(currentUserId).child("connections").child("matches").child(dataSnapshot.getKey()).setValue(true);
@@ -251,8 +286,41 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void goToSettings(View v){
-        Utils.changeActivity(MainActivity.this, SettingsActivity.class);
+    private void sendNotification(final String receiver){
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(currentUserId, R.drawable.logo, "Nouveau matchs", "genlike", receiver);
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if(response.code() == 200){
+                                        if(response.body().success != 1){
+                                            Utils.debug(MainActivity.this, "Failed");
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }

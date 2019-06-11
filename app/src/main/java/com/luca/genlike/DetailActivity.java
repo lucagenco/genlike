@@ -3,6 +3,8 @@ package com.luca.genlike;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.luca.genlike.Utils.Utils;
+import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,7 +21,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.net.MalformedURLException;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -32,6 +37,7 @@ public class DetailActivity extends AppCompatActivity {
      * androidx.fragment.app.FragmentStatePagerAdapter.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private Bundle bundle;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -43,8 +49,36 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //Users INFOS
+        String hUserID = getIntent().getExtras().getString("userID");
+        String hUserFirstName = getIntent().getExtras().getString("userFirstName");
+        String hUserBirthday = getIntent().getExtras().getString("userBirthday");
+        String hUserLatitude = getIntent().getExtras().getString("userLatitude");
+        String hUserLongitude= getIntent().getExtras().getString("userLongitude");
+        String hUserDescription = getIntent().getExtras().getString("userDescription");
+        String hUserProfileImage = getIntent().getExtras().getString("userProfileImage");
+        String hUserIdFacebook = getIntent().getExtras().getString("userIDFacebook");
+        String mLatitude = getIntent().getExtras().getString("myLatitude");
+        String mLongitude = getIntent().getExtras().getString("myLongitude");
+        String mUserID = getIntent().getExtras().getString("myUserID");
+        bundle = new Bundle();
+        bundle.putString("userID", hUserID);
+        bundle.putString("userProfileImage", hUserProfileImage);
+        bundle.putString("userIdFacebook", hUserIdFacebook);
+        bundle.putString("userDescription", hUserDescription);
+        bundle.putString("userLatitude", hUserLatitude);
+        bundle.putString("userLongitude", hUserLongitude);
+        bundle.putString("userBirthday", hUserBirthday);
+        bundle.putString("userFirstName", hUserFirstName);
+        bundle.putString("myLongitude", mLongitude);
+        bundle.putString("myLatitude", mLatitude);
+        bundle.putString("myUserID", mUserID);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(hUserFirstName);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -54,7 +88,12 @@ public class DetailActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Utils.changeActivity(DetailActivity.this, MainActivity.class);
+            }
+        });
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
     }
@@ -108,9 +147,15 @@ public class DetailActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             Fragment fragment = null;
             switch (position){
-                case 0: fragment = new FragmentInfoUser();
+                case 0: {
+                    fragment = new FragmentInfoUser();
+                    fragment.setArguments(bundle);
+                }
                 break;
-                case 1: fragment = new FragmentPictureUser();
+                case 1:{
+                    fragment = new FragmentPictureUser();
+                    fragment.setArguments(bundle);
+                }
                 break;
             }
             return fragment;

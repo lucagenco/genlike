@@ -2,9 +2,75 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:text="test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/image_profil"
+            android:src="@color/colorPrimaryDark"
+            android:layout_width="match_parent"
+            android:layout_height="350dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/like"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="-20dp"
+                android:textSize="12dp"
+                android:onClick="selectLike"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:text="  Like"
+                android:drawableLeft="@drawable/ic_thumb_up_white_24dp"
+                android:padding="5dp"
+                android:background="@color/colorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/nope"
+                android:layout_marginLeft="130dp"
+                android:layout_marginTop="-48dp"
+                android:textSize="12dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:onClick="selectNope"
+                android:text="  Nope"
+                android:drawableLeft="@drawable/ic_thumb_down_white_24dp"
+                android:padding="5dp"
+                android:background="@color/colorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/ageAndName"
+            android:textSize="25dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:text="Nom, age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/distance"
+            android:textSize="16dp"
+            android:layout_marginLeft="20dp"
+            android:text="10 km"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/my_description"
+            android:textSize="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:text="Description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
 
 </LinearLayout>

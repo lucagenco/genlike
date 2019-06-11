@@ -27,27 +27,28 @@
         android:layout_height="match_parent">
         <com.lorentzos.flingswipe.SwipeFlingAdapterView
             android:id="@+id/frame"
+            android:layout_gravity="center"
             android:background="@color/backWhite"
             android:visibility="gone"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="450dp"
             app:rotation_degrees="15.5"
             tools:context=".MyActivity" />
 
         <LinearLayout
-            android:gravity="center"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <pl.droidsonroids.gif.GifImageView
                 android:id="@+id/search"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginTop="180dp"
-                android:visibility="visible"
                 android:layout_marginBottom="170dp"
                 android:src="@drawable/search"
-                android:layout_width="100dp"
-                android:layout_height="100dp" />
+                android:visibility="visible" />
 
         </LinearLayout>
 
@@ -84,8 +85,19 @@
                 android:layout_height="wrap_content" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:onClick="refresh"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:drawableLeft="@drawable/ic_refresh_white_24dp"
+                android:padding="5dp"
+                android:background="@color/colorPrimaryDark"
+                android:layout_width="35dp"
+                android:layout_height="wrap_content" />
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:onClick="selectRight"
-                android:layout_marginLeft="30dp"
+                android:layout_marginLeft="10dp"
                 android:layout_gravity="center"
                 android:textSize="12dp"
                 style="@style/Widget.AppCompat.Button.Colored"
